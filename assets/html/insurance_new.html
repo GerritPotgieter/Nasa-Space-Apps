@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE ORB - Fleet Insurance</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: #121212;
+        color: #eaeaea;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      /* Header Styles */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(18, 18, 18, 0.95);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(234, 234, 234, 0.15);
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: #eaeaea;
+      }
+
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 3rem;
+      }
+
+      .nav-link {
+        color: #eaeaea;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: #e85d04;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #e85d04, #f77f00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+
+      .main {
+        padding-top: 70px;
+        min-height: 100vh;
+        padding-bottom: 4rem;
+      }
+
+      /* Insurance Section */
+      .insurance-section {
+        padding: 4rem 0;
+        background: #121212;
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem 0;
+      }
+
+      .section-header h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: #eaeaea;
+      }
+
+      .section-header p {
+        color: #eaeaea;
+        font-size: 1rem;
+        opacity: 0.8;
+      }
+
+      /* Demo Tier Selector */
+      .demo-selector {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: rgba(232, 93, 4, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(232, 93, 4, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .demo-selector label {
+        color: #eaeaea;
+        opacity: 0.8;
+        font-size: 0.9rem;
+      }
+
+      .demo-selector select {
+        background: rgba(18, 18, 18, 0.7);
+        color: #eaeaea;
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      /* Locked Message */
+      .locked-message {
+        background: rgba(232, 93, 4, 0.05);
+        border: 2px solid #e85d04;
+        border-radius: 12px;
+        padding: 3rem;
+        text-align: center;
+        margin: 2rem 0;
+      }
+
+      .locked-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .locked-message h2 {
+        color: #eaeaea;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+      }
+
+      .locked-message p {
+        color: #eaeaea;
+        opacity: 0.7;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+      }
+
+      .locked-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+      }
+
+      .btn-primary {
+        background: #e85d04;
+        color: #121212;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background: #f77f00;
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: #e85d04;
+        border: 2px solid #e85d04;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-secondary:hover {
+        background: rgba(232, 93, 4, 0.1);
+      }
+
+      /* Metrics Grid */
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .metric-card {
+        background: rgba(18, 18, 18, 0.5);
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        border-radius: 12px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .metric-card.warning {
+        border-color: #e85d04;
+      }
+
+      .metric-icon {
+        color: #e85d04;
+        margin-bottom: 0.75rem;
+        font-size: 1.5rem;
+      }
+
+      .metric-label {
+        color: #eaeaea;
+        opacity: 0.7;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .metric-value {
+        color: #eaeaea;
+        font-size: 1.75rem;
+        font-weight: 700;
+      }
+
+      /* Alert Box */
+      .alert-box {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .alert-header {
+        color: #ef4444;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+      }
+
+      .alert-item {
+        color: #fca5a5;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Search and Filter Bar */
+      .controls-bar {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .search-box {
+        flex: 1;
+        min-width: 250px;
+        position: relative;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+        background: rgba(18, 18, 18, 0.7);
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        border-radius: 8px;
+        color: #eaeaea;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+      }
+
+      .search-box input:focus {
+        outline: none;
+        border-color: #e85d04;
+        background: rgba(18, 18, 18, 0.9);
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #eaeaea;
+        opacity: 0.6;
+      }
+
+      .filter-select {
+        padding: 0.75rem 1rem;
+        background: rgba(18, 18, 18, 0.7);
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        border-radius: 8px;
+        color: #eaeaea;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .filter-select:focus {
+        outline: none;
+        border-color: #e85d04;
+      }
+
+      /* Satellite Cards */
+      .satellite-card {
+        background: rgba(18, 18, 18, 0.5);
+        border: 2px solid rgba(234, 234, 234, 0.15);
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .satellite-card.uninsured {
+        border-color: #ef4444;
+      }
+
+      .satellite-card.expiring {
+        border-color: #eab308;
+      }
+
+      .card-header {
+        padding: 1.25rem 1.5rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.3s ease;
+      }
+
+      .card-header:hover {
+        background: rgba(232, 93, 4, 0.05);
+      }
+
+      .card-header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+      }
+
+      .status-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .status-operational {
+        background: #22c55e;
+        box-shadow: 0 0 10px #22c55e;
+      }
+
+      .satellite-info h3 {
+        color: #eaeaea;
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .satellite-meta {
+        color: #eaeaea;
+        opacity: 0.7;
+        font-size: 0.85rem;
+      }
+
+      .card-header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .badge-uninsured {
+        background: #ef4444;
+        color: #fff;
+      }
+
+      .badge-expiring {
+        background: #eab308;
+        color: #000;
+      }
+
+      .badge-risk {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+      }
+
+      .chevron {
+        color: #eaeaea;
+        opacity: 0.6;
+      }
+
+      /* Card Details */
+      .card-details {
+        padding: 0 1.5rem 1.5rem 1.5rem;
+        border-top: 1px solid rgba(234, 234, 234, 0.15);
+        display: none;
+      }
+
+      .card-details.expanded {
+        display: block;
+      }
+
+      .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+      }
+
+      .detail-section h4 {
+        color: #e85d04;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        font-size: 0.85rem;
+      }
+
+      .info-label {
+        color: #eaeaea;
+        opacity: 0.7;
+      }
+
+      .info-value {
+        color: #eaeaea;
+        font-weight: 500;
+      }
+
+      .no-insurance {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        color: #fca5a5;
+        text-align: center;
+      }
+
+      .card-actions {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(234, 234, 234, 0.15);
+        display: flex;
+        gap: 0.75rem;
+      }
+
+      .card-actions button {
+        flex: 1;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <a href="dashboard.html" class="logo">THE ORB</a>
+        <ul class="nav-menu">
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          <li><a href="tracker_v2.html" class="nav-link">Tracker</a></li>
+          <li><a href="registry.html" class="nav-link">Registry</a></li>
+          <li>
+            <a href="insurance_new.html" class="nav-link active">Insurance</a>
+          </li>
+          <li><a href="compliance.html" class="nav-link">Compliance</a></li>
+        </ul>
+        <div class="user-profile">
+          <div class="user-avatar">SA</div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main">
+      <section class="insurance-section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Fleet Insurance Overview</h2>
+            <p>
+              Comprehensive insurance tracking and risk management for your
+              satellite fleet
+            </p>
+          </div>
+
+          <!-- Demo Tier Selector -->
+          <div class="demo-selector">
+            <label>Demo Mode - Select User Tier:</label>
+            <select id="userTierSelect">
+              <option value="public">Public (No Account)</option>
+              <option value="free">Free Account</option>
+              <option value="premium">Premium Subscriber</option>
+              <option value="fleet_owner" selected>Fleet Owner</option>
+            </select>
+          </div>
+
+          <!-- Locked Message (shown for non-fleet owners) -->
+          <div id="lockedMessage" class="locked-message hidden">
+            <div class="locked-icon">🔒</div>
+            <h2>Insurance Data Restricted</h2>
+            <p>
+              This data requires fleet owner authorization. Sign in to access
+              insurance tracking, risk assessment, and financial data for your
+              satellites.
+            </p>
+            <div class="locked-buttons">
+              <button class="btn-primary">Sign In to Manage Your Fleet</button>
+              <button class="btn-secondary">Request Access</button>
+            </div>
+          </div>
+
+          <!-- Insurance Dashboard (shown for fleet owners) -->
+          <div id="insuranceDashboard">
+            <!-- Metrics Grid -->
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <div class="metric-icon">🛡️</div>
+                <div class="metric-label">Total Insured Value</div>
+                <div class="metric-value" id="totalCoverage">$0</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-icon">📈</div>
+                <div class="metric-label">Annual Premiums</div>
+                <div class="metric-value" id="totalPremiums">$0</div>
+              </div>
+              <div class="metric-card" id="uninsuredCard">
+                <div class="metric-icon">⚠️</div>
+                <div class="metric-label">Uninsured Satellites</div>
+                <div class="metric-value" id="uninsuredCount">0</div>
+              </div>
+              <div class="metric-card" id="expiringCard">
+                <div class="metric-icon">📅</div>
+                <div class="metric-label">Expiring Soon (90 days)</div>
+                <div class="metric-value" id="expiringCount">0</div>
+              </div>
+            </div>
+
+            <!-- Alert Box -->
+            <div id="alertBox" class="alert-box hidden">
+              <div class="alert-header">⚠️ Action Required</div>
+              <div id="alertItems"></div>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="controls-bar">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="Search satellites..."
+                />
+              </div>
+              <select class="filter-select" id="filterSelect">
+                <option value="all">All Satellites</option>
+                <option value="insured">Insured</option>
+                <option value="uninsured">Uninsured</option>
+                <option value="expiring">Expiring Soon</option>
+              </select>
+            </div>
+
+            <!-- Satellite Cards Container -->
+            <div id="satelliteCardsContainer"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Sample satellite data (in production, this would come from your API/database)
+      const satelliteData = [
+        {
+          id: "SAT-001",
+          name: "STARLINK-4582",
+          owner: "SpaceX",
+          status: "O",
+          launchDate: "2021-01-15",
+          mass: 260,
+          orbit: "LEO",
+          altitude: 550,
+          launchInsurance: {
+            insured: true,
+            provider: "AXA Space",
+            coverage: 18000000,
+            premium: 720000,
+            policyNumber: "LI-2021-4582",
+            startDate: "2021-01-10",
+            endDate: "2021-01-20",
+            status: "completed",
+          },
+          operationalInsurance: {
+            insured: true,
+            provider: "Lloyd's of London",
+            coverage: 15200000,
+            premium: 240000,
+            premiumFrequency: "annual",
+            policyNumber: "OI-2021-4582",
+            startDate: "2021-01-20",
+            endDate: "2026-12-15",
+            deductible: 500000,
+            claimsHistory: [
+              {
+                date: "2023-08-15",
+                type: "Battery Anomaly",
+                amount: 0,
+                status: "resolved",
+              },
+            ],
+          },
+          riskScore: 67,
+          age: 4.2,
+          fuelRemaining: 38,
+          healthScore: 87,
+          lastAnomaly: 47,
+          revenuePerMonth: 125000,
+        },
+        {
+          id: "SAT-002",
+          name: "SENTINEL-3B",
+          owner: "ESA",
+          status: "O",
+          launchDate: "2018-04-25",
+          mass: 1250,
+          orbit: "LEO",
+          altitude: 814,
+          launchInsurance: {
+            insured: true,
+            provider: "Allianz Space",
+            coverage: 245000000,
+            premium: 12250000,
+            policyNumber: "LI-2018-SEN3B",
+            startDate: "2018-04-15",
+            endDate: "2018-05-05",
+            status: "completed",
+          },
+          operationalInsurance: {
+            insured: true,
+            provider: "Munich Re",
+            coverage: 180000000,
+            premium: 4500000,
+            premiumFrequency: "annual",
+            policyNumber: "OI-2018-SEN3B",
+            startDate: "2018-05-05",
+            endDate: "2025-05-05",
+            deductible: 2000000,
+            claimsHistory: [],
+          },
+          riskScore: 45,
+          age: 6.5,
+          fuelRemaining: 62,
+          healthScore: 92,
+          lastAnomaly: 180,
+          revenuePerMonth: 0,
+        },
+        {
+          id: "SAT-003",
+          name: "GEOSAT-12",
+          owner: "Intelsat",
+          status: "AR",
+          launchDate: "2019-07-10",
+          mass: 6500,
+          orbit: "GEO",
+          altitude: 35786,
+          launchInsurance: {
+            insured: true,
+            provider: "AIG Space",
+            coverage: 425000000,
+            premium: 21250000,
+            policyNumber: "LI-2019-GEO12",
+            startDate: "2019-07-01",
+            endDate: "2019-07-25",
+            status: "completed",
+          },
+          operationalInsurance: {
+            insured: false,
+            provider: null,
+            coverage: 0,
+            premium: 0,
+            premiumFrequency: null,
+            policyNumber: null,
+            startDate: null,
+            endDate: null,
+            deductible: 0,
+            claimsHistory: [],
+          },
+          riskScore: 78,
+          age: 5.2,
+          fuelRemaining: 22,
+          healthScore: 64,
+          lastAnomaly: 12,
+          revenuePerMonth: 850000,
+        },
+        {
+          id: "SAT-004",
+          name: "WORLDVIEW-5",
+          owner: "Maxar",
+          status: "O",
+          launchDate: "2022-09-30",
+          mass: 2800,
+          orbit: "SSO",
+          altitude: 617,
+          launchInsurance: {
+            insured: true,
+            provider: "Marsh Space",
+            coverage: 380000000,
+            premium: 15200000,
+            policyNumber: "LI-2022-WV5",
+            startDate: "2022-09-20",
+            endDate: "2022-10-15",
+            status: "completed",
+          },
+          operationalInsurance: {
+            insured: true,
+            provider: "Swiss Re",
+            coverage: 320000000,
+            premium: 8500000,
+            premiumFrequency: "annual",
+            policyNumber: "OI-2022-WV5",
+            startDate: "2022-10-15",
+            endDate: "2025-10-31",
+            deductible: 5000000,
+            claimsHistory: [],
+          },
+          riskScore: 32,
+          age: 2.0,
+          fuelRemaining: 89,
+          healthScore: 96,
+          lastAnomaly: 420,
+          revenuePerMonth: 2100000,
+        },
+      ];
+
+      let currentTier = "fleet_owner";
+      let filteredSatellites = [...satelliteData];
+      let searchTerm = "";
+      let filterStatus = "all";
+
+      // Utility functions
+      function formatCurrency(amount) {
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(amount);
+      }
+
+      function getDaysUntilExpiry(endDate) {
+        if (!endDate) return null;
+        const end = new Date(endDate);
+        const now = new Date();
+        return Math.floor((end - now) / (1000 * 60 * 60 * 24));
+      }
+
+      function getRiskColor(score) {
+        if (score >= 70) return "#ef4444";
+        if (score >= 50) return "#eab308";
+        return "#22c55e";
+      }
+
+      // Calculate fleet statistics
+      function calculateFleetStats() {
+        const stats = {
+          totalSatellites: satelliteData.length,
+          insuredOperational: satelliteData.filter(
+            (s) => s.operationalInsurance.insured
+          ).length,
+          uninsured: satelliteData.filter(
+            (s) => !s.operationalInsurance.insured
+          ).length,
+          totalCoverage: satelliteData.reduce(
+            (sum, s) => sum + (s.operationalInsurance.coverage || 0),
+            0
+          ),
+          totalPremiums: satelliteData.reduce(
+            (sum, s) => sum + (s.operationalInsurance.premium || 0),
+            0
+          ),
+          expiringWithin90Days: satelliteData.filter((s) => {
+            if (!s.operationalInsurance.endDate) return false;
+            const daysUntil = getDaysUntilExpiry(
+              s.operationalInsurance.endDate
+            );
+            return daysUntil <= 90 && daysUntil > 0;
+          }).length,
+          atRisk: satelliteData.filter((s) => s.riskScore > 70).length,
+        };
+        return stats;
+      }
+
+      // Update metrics display
+      function updateMetrics() {
+        const stats = calculateFleetStats();
+
+        document.getElementById("totalCoverage").textContent = formatCurrency(
+          stats.totalCoverage
+        );
+        document.getElementById("totalPremiums").textContent = formatCurrency(
+          stats.totalPremiums
+        );
+        document.getElementById("uninsuredCount").textContent = stats.uninsured;
+        document.getElementById("expiringCount").textContent =
+          stats.expiringWithin90Days;
+
+        // Update warning styles
+        const uninsuredCard = document.getElementById("uninsuredCard");
+        const expiringCard = document.getElementById("expiringCard");
+
+        if (stats.uninsured > 0) {
+          uninsuredCard.classList.add("warning");
+        } else {
+          uninsuredCard.classList.remove("warning");
+        }
+
+        if (stats.expiringWithin90Days > 0) {
+          expiringCard.classList.add("warning");
+        } else {
+          expiringCard.classList.remove("warning");
+        }
+
+        // Show/hide alert box
+        updateAlertBox(stats);
+      }
+
+      // Update alert box
+      function updateAlertBox(stats) {
+        const alertBox = document.getElementById("alertBox");
+        const alertItems = document.getElementById("alertItems");
+
+        if (
+          stats.uninsured > 0 ||
+          stats.expiringWithin90Days > 0 ||
+          stats.atRisk > 0
+        ) {
+          alertBox.classList.remove("hidden");
+
+          let html = "";
+          if (stats.uninsured > 0) {
+            html += `<div class="alert-item">• ${stats.uninsured} satellite(s) currently uninsured</div>`;
+          }
+          if (stats.expiringWithin90Days > 0) {
+            html += `<div class="alert-item" style="color: #fde047;">• ${stats.expiringWithin90Days} insurance policy(ies) expire within 90 days</div>`;
+          }
+          if (stats.atRisk > 0) {
+            html += `<div class="alert-item" style="color: #fb923c;">• ${stats.atRisk} satellite(s) have elevated risk scores</div>`;
+          }
+
+          alertItems.innerHTML = html;
+        } else {
+          alertBox.classList.add("hidden");
+        }
+      }
+
+      // Apply filters
+      function applyFilters() {
+        filteredSatellites = satelliteData.filter((sat) => {
+          // Search filter
+          if (searchTerm) {
+            const search = searchTerm.toLowerCase();
+            const matchesSearch =
+              sat.name.toLowerCase().includes(search) ||
+              sat.id.toLowerCase().includes(search);
+            if (!matchesSearch) return false;
+          }
+
+          // Status filter
+          if (filterStatus === "insured" && !sat.operationalInsurance.insured)
+            return false;
+          if (filterStatus === "uninsured" && sat.operationalInsurance.insured)
+            return false;
+          if (filterStatus === "expiring") {
+            const daysUntil = getDaysUntilExpiry(
+              sat.operationalInsurance.endDate
+            );
+            if (daysUntil === null || daysUntil > 90 || daysUntil <= 0)
+              return false;
+          }
+
+          return true;
+        });
+
+        renderSatelliteCards();
+      }
+
+      // Render satellite cards
+      function renderSatelliteCards() {
+        const container = document.getElementById("satelliteCardsContainer");
+
+        if (filteredSatellites.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 3rem; color: #eaeaea; opacity: 0.7;">
+              No satellites match your filters
+            </div>
+          `;
+          return;
+        }
+
+        const cardsHTML = filteredSatellites
+          .map((sat) => {
+            const daysUntilExpiry = getDaysUntilExpiry(
+              sat.operationalInsurance.endDate
+            );
+            const isExpiringSoon =
+              daysUntilExpiry !== null &&
+              daysUntilExpiry <= 90 &&
+              daysUntilExpiry > 0;
+            const isUninsured = !sat.operationalInsurance.insured;
+            const isHighRisk = sat.riskScore > 70;
+
+            let cardClass = "satellite-card";
+            if (isUninsured) cardClass += " uninsured";
+            else if (isExpiringSoon) cardClass += " expiring";
+
+            return `
+              <div class="${cardClass}" data-id="${sat.id}">
+                <div class="card-header" onclick="toggleCard('${sat.id}')">
+                  <div class="card-header-left">
+                    <div class="status-dot status-operational"></div>
+                    <div class="satellite-info">
+                      <h3>${sat.name}</h3>
+                      <div class="satellite-meta">${sat.id} • ${sat.owner} • ${
+              sat.orbit
+            }</div>
+                    </div>
+                  </div>
+                  <div class="card-header-right">
+                    ${
+                      isUninsured
+                        ? '<span class="badge badge-uninsured">UNINSURED</span>'
+                        : ""
+                    }
+                    ${
+                      isExpiringSoon && !isUninsured
+                        ? `<span class="badge badge-expiring">EXPIRES IN ${daysUntilExpiry} DAYS</span>`
+                        : ""
+                    }
+                    ${
+                      isHighRisk
+                        ? '<span class="badge badge-risk">HIGH RISK</span>'
+                        : ""
+                    }
+                    <span class="chevron">▼</span>
+                  </div>
+                </div>
+                <div class="card-details" id="details-${sat.id}">
+                  <div class="details-grid">
+                    <div class="detail-section">
+                      <h4>Launch Insurance</h4>
+                      <div class="info-row">
+                        <span class="info-label">Provider</span>
+                        <span class="info-value">${
+                          sat.launchInsurance.provider
+                        }</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label">Coverage</span>
+                        <span class="info-value">${formatCurrency(
+                          sat.launchInsurance.coverage
+                        )}</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label">Premium</span>
+                        <span class="info-value">${formatCurrency(
+                          sat.launchInsurance.premium
+                        )}</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value" style="color: #22c55e;">COMPLETED</span>
+                      </div>
+                    </div>
+
+                    <div class="detail-section">
+                      <h4>Operational Insurance</h4>
+                      ${
+                        sat.operationalInsurance.insured
+                          ? `
+                        <div class="info-row">
+                          <span class="info-label">Provider</span>
+                          <span class="info-value">${
+                            sat.operationalInsurance.provider
+                          }</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Coverage</span>
+                          <span class="info-value">${formatCurrency(
+                            sat.operationalInsurance.coverage
+                          )}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Annual Premium</span>
+                          <span class="info-value">${formatCurrency(
+                            sat.operationalInsurance.premium
+                          )}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Deductible</span>
+                          <span class="info-value">${formatCurrency(
+                            sat.operationalInsurance.deductible
+                          )}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Policy Expires</span>
+                          <span class="info-value" style="color: ${
+                            isExpiringSoon ? "#eab308" : "#eaeaea"
+                          }">
+                            ${sat.operationalInsurance.endDate}${
+                              isExpiringSoon ? ` (${daysUntilExpiry} days)` : ""
+                            }
+                          </span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Claims</span>
+                          <span class="info-value">${
+                            sat.operationalInsurance.claimsHistory.length
+                          }</span>
+                        </div>
+                      `
+                          : `
+                        <div class="no-insurance">
+                          ⚠️ No Active Coverage<br>
+                          This satellite is currently uninsured.
+                        </div>
+                      `
+                      }
+                    </div>
+
+                    <div class="detail-section">
+                      <h4>Risk Assessment</h4>
+                      <div class="info-row">
+                        <span class="info-label">Risk Score</span>
+                        <span class="info-value" style="color: ${getRiskColor(
+                          sat.riskScore
+                        )}; font-weight: 600;">
+                          ${sat.riskScore}/100
+                        </span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label">Health Score</span>
+                        <span class="info-value">${sat.healthScore}/100</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label">Age</span>
+                        <span class="info-value">${sat.age} years</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label">Fuel Remaining</span>
+                        <span class="info-value">${sat.fuelRemaining}%</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label">Last Anomaly</span>
+                        <span class="info-value">${
+                          sat.lastAnomaly
+                        } days ago</span>
+                      </div>
+                      ${
+                        sat.revenuePerMonth > 0
+                          ? `
+                        <div class="info-row">
+                          <span class="info-label">Monthly Revenue</span>
+                          <span class="info-value">${formatCurrency(
+                            sat.revenuePerMonth
+                          )}</span>
+                        </div>
+                      `
+                          : ""
+                      }
+                    </div>
+                  </div>
+
+                  <div class="card-actions">
+                    <button class="btn-primary">View Full Details</button>
+                    ${
+                      !sat.operationalInsurance.insured
+                        ? '<button class="btn-secondary" style="color: #22c55e; border-color: #22c55e;">Get Insurance Quote</button>'
+                        : ""
+                    }
+                    ${
+                      sat.operationalInsurance.insured && isExpiringSoon
+                        ? '<button class="btn-secondary" style="color: #eab308; border-color: #eab308;">Renew Policy</button>'
+                        : ""
+                    }
+                  </div>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+
+        container.innerHTML = cardsHTML;
+      }
+
+      // Toggle card expansion
+      function toggleCard(satId) {
+        const details = document.getElementById(`details-${satId}`);
+        details.classList.toggle("expanded");
+
+        // Update chevron
+        const card = document.querySelector(`[data-id="${satId}"]`);
+        const chevron = card.querySelector(".chevron");
+        chevron.textContent = details.classList.contains("expanded")
+          ? "▲"
+          : "▼";
+      }
+
+      // Update tier visibility
+      function updateTierVisibility() {
+        const lockedMessage = document.getElementById("lockedMessage");
+        const dashboard = document.getElementById("insuranceDashboard");
+
+        if (currentTier === "fleet_owner") {
+          lockedMessage.classList.add("hidden");
+          dashboard.classList.remove("hidden");
+          updateMetrics();
+          renderSatelliteCards();
+        } else {
+          lockedMessage.classList.remove("hidden");
+          dashboard.classList.add("hidden");
+        }
+      }
+
+      // Event listeners
+      document.addEventListener("DOMContentLoaded", function () {
+        // Tier selector
+        document
+          .getElementById("userTierSelect")
+          .addEventListener("change", function (e) {
+            currentTier = e.target.value;
+            updateTierVisibility();
+          });
+
+        // Search
+        document
+          .getElementById("searchInput")
+          .addEventListener("input", function (e) {
+            searchTerm = e.target.value;
+            applyFilters();
+          });
+
+        // Filter
+        document
+          .getElementById("filterSelect")
+          .addEventListener("change", function (e) {
+            filterStatus = e.target.value;
+            applyFilters();
+          });
+
+        // Initialize
+        updateTierVisibility();
+      });
+
+      // Make toggleCard available globally
+      window.toggleCard = toggleCard;
+    </script>
+  </body>
+</html>

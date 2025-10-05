@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE ORB - Satellite Registry</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: #121212;
+        color: #eaeaea;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      /* Header Styles */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(18, 18, 18, 0.95);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(234, 234, 234, 0.15);
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: #eaeaea;
+      }
+
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 3rem;
+      }
+
+      .nav-link {
+        color: #eaeaea;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: #e85d04;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b35, #ff8c42);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+
+      .main {
+        padding-top: 70px;
+        min-height: 100vh;
+      }
+
+      /* Registry Section */
+      .registry-section {
+        padding: 4rem 0;
+        background: #121212;
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem 0;
+      }
+
+      .section-header h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: #eaeaea;
+      }
+
+      .section-header p {
+        color: #eaeaea;
+        font-size: 1rem;
+        opacity: 0.8;
+      }
+
+      .table-container {
+        background: rgba(18, 18, 18, 0.3);
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        border-radius: 12px;
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+      }
+
+      .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(234, 234, 234, 0.15);
+      }
+
+      .table-header h3 {
+        font-size: 1.3rem;
+        color: #e85d04;
+      }
+
+      .search-input {
+        padding: 0.75rem 1.5rem;
+        background: rgba(18, 18, 18, 0.5);
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        border-radius: 25px;
+        color: #eaeaea;
+        font-size: 0.9rem;
+        width: 300px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #e85d04;
+        background: rgba(18, 18, 18, 0.7);
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .data-table thead {
+        background: rgba(18, 18, 18, 0.5);
+      }
+
+      .data-table th {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+        color: #e85d04;
+        border-bottom: 1px solid rgba(234, 234, 234, 0.15);
+      }
+
+      .data-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(234, 234, 234, 0.08);
+        color: #eaeaea;
+        opacity: 0.9;
+      }
+
+      .data-table tbody tr {
+        transition: all 0.3s ease;
+      }
+
+      .data-table tbody tr:hover {
+        background: rgba(232, 93, 4, 0.05);
+      }
+
+      .status-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: inline-block;
+      }
+
+      .status-active {
+        background: rgba(46, 213, 115, 0.2);
+        color: #2ed573;
+      }
+
+      .status-inactive {
+        background: rgba(232, 93, 4, 0.2);
+        color: #e85d04;
+      }
+
+      .status-deorbited {
+        background: rgba(255, 71, 87, 0.2);
+        color: #ff4757;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 3rem;
+        color: #eaeaea;
+        opacity: 0.7;
+      }
+
+      .filter-bar {
+        padding: 1rem 2rem;
+        background: rgba(18, 18, 18, 0.5);
+        border-bottom: 1px solid rgba(234, 234, 234, 0.15);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        backdrop-filter: blur(10px);
+      }
+
+      .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .filter-label {
+        color: #eaeaea;
+        opacity: 0.7;
+        font-size: 0.85rem;
+        margin-right: 0.5rem;
+        white-space: nowrap;
+      }
+
+      .filter-button {
+        padding: 0.5rem 1rem;
+        background: rgba(18, 18, 18, 0.7);
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        border-radius: 6px;
+        color: #eaeaea;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+      }
+
+      .filter-button.active,
+      .filter-button:hover {
+        background: #e85d04;
+        border-color: #e85d04;
+        color: #121212;
+        transform: translateY(-1px);
+      }
+
+      .filter-select {
+        padding: 0.5rem 1rem;
+        background: rgba(18, 18, 18, 0.7);
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        border-radius: 6px;
+        color: #eaeaea;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .filter-select:focus {
+        outline: none;
+        border-color: #e85d04;
+        background: rgba(18, 18, 18, 0.9);
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        border-top: 1px solid rgba(234, 234, 234, 0.15);
+      }
+
+      .pagination-button {
+        padding: 0.5rem 1rem;
+        background: rgba(18, 18, 18, 0.7);
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        border-radius: 6px;
+        color: #eaeaea;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .pagination-button:hover:not(:disabled) {
+        background: #e85d04;
+        border-color: #e85d04;
+        color: #121212;
+        transform: translateY(-1px);
+      }
+
+      .pagination-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .pagination-info {
+        color: #eaeaea;
+        opacity: 0.7;
+        font-size: 0.85rem;
+      }
+
+      .stats-row {
+        display: flex;
+        gap: 2rem;
+        padding: 1rem 2rem;
+        background: rgba(18, 18, 18, 0.5);
+        border-bottom: 1px solid rgba(234, 234, 234, 0.15);
+        backdrop-filter: blur(10px);
+      }
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .stat-label {
+        color: #eaeaea;
+        opacity: 0.7;
+        font-size: 0.85rem;
+      }
+
+      .stat-value {
+        color: #e85d04;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <a href="dashboard.html" class="logo">THE ORB</a>
+        <ul class="nav-menu">
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          <li><a href="tracker_v2.html" class="nav-link">Tracker</a></li>
+          <li><a href="registry.html" class="nav-link active">Registry</a></li>
+          <li><a href="insurance_new.html" class="nav-link">Insurance</a></li>
+          <li><a href="compliance.html" class="nav-link">Compliance</a></li>
+        </ul>
+        <div class="user-profile">
+          <div class="user-avatar">SA</div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main">
+      <section class="registry-section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Satellite Registry</h2>
+            <p>
+              Complete database of 65,880+ satellites with filtering and search
+              capabilities
+            </p>
+          </div>
+
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Satellites (<span id="satelliteCount">0</span>)</h3>
+              <input
+                type="text"
+                class="search-input"
+                placeholder="Search by name, NORAD ID, or owner..."
+                id="registrySearch"
+              />
+            </div>
+
+            <div class="stats-row">
+              <div class="stat-item">
+                <span class="stat-label">Total:</span>
+                <span class="stat-value" id="totalCount">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Active:</span>
+                <span class="stat-value" id="activeCount">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Inactive:</span>
+                <span class="stat-value" id="inactiveCount">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Showing:</span>
+                <span class="stat-value" id="showingCount">0</span>
+              </div>
+            </div>
+
+            <div class="filter-bar">
+              <div class="filter-group">
+                <span class="filter-label">Status:</span>
+                <button class="filter-button active" data-status="all">
+                  All
+                </button>
+                <button class="filter-button" data-status="ACTIVE">
+                  Active
+                </button>
+                <button class="filter-button" data-status="INACTIVE">
+                  Inactive
+                </button>
+              </div>
+
+              <div class="filter-group">
+                <span class="filter-label">Type:</span>
+                <button class="filter-button active" data-type="all">
+                  All
+                </button>
+                <button class="filter-button" data-type="P">Payload</button>
+                <button class="filter-button" data-type="R">Rocket Body</button>
+                <button class="filter-button" data-type="C">Debris</button>
+              </div>
+
+              <div class="filter-group">
+                <span class="filter-label">Owner:</span>
+                <select class="filter-select" id="ownerFilter">
+                  <option value="all">All Countries</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <span class="filter-label">Sort by:</span>
+                <select class="filter-select" id="sortFilter">
+                  <option value="name">Name (A-Z)</option>
+                  <option value="date-desc">Launch Date (Newest)</option>
+                  <option value="date-asc">Launch Date (Oldest)</option>
+                  <option value="norad">NORAD ID</option>
+                </select>
+              </div>
+            </div>
+
+            <table class="data-table" id="satelliteTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>NORAD ID</th>
+                  <th>Type</th>
+                  <th>Owner</th>
+                  <th>Launch Date</th>
+                  <th>Status</th>
+                  <th>Destination</th>
+                </tr>
+              </thead>
+              <tbody id="satelliteTableBody">
+                <tr>
+                  <td colspan="7" class="loading">Loading satellite data...</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="pagination">
+              <button class="pagination-button" id="firstPage">First</button>
+              <button class="pagination-button" id="prevPage">Previous</button>
+              <span class="pagination-info" id="pageInfo">Page 1 of 1</span>
+              <button class="pagination-button" id="nextPage">Next</button>
+              <button class="pagination-button" id="lastPage">Last</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      let allSatellites = [];
+      let filteredSatellites = [];
+      let currentPage = 1;
+      const itemsPerPage = 50;
+
+      // Filter state
+      let filters = {
+        search: "",
+        status: "all",
+        type: "all",
+        owner: "all",
+        sort: "name",
+      };
+
+      // CSV Parser for master list
+      function parseCSV(csvText) {
+        const lines = csvText.trim().split("\n");
+        const headers = lines[0].split(",").map((h) => h.trim());
+        const records = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i];
+          if (!line.trim()) continue;
+
+          // Simple CSV parsing (handles quoted fields)
+          const values = [];
+          let currentValue = "";
+          let inQuotes = false;
+
+          for (let j = 0; j < line.length; j++) {
+            const char = line[j];
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === "," && !inQuotes) {
+              values.push(currentValue.trim());
+              currentValue = "";
+            } else {
+              currentValue += char;
+            }
+          }
+          values.push(currentValue.trim());
+
+          const record = {};
+          headers.forEach((header, index) => {
+            record[header] = values[index] || "";
+          });
+          records.push(record);
+        }
+
+        return records;
+      }
+
+      // Load and populate table
+      async function initializeTableData() {
+        try {
+          const response = await fetch("../../data/satellite_master_list.csv");
+          const csvText = await response.text();
+          allSatellites = parseCSV(csvText);
+          filteredSatellites = [...allSatellites];
+
+          console.log(`Loaded ${allSatellites.length} satellites`);
+
+          // Populate owner filter dropdown
+          populateOwnerFilter();
+
+          // Update stats
+          updateStats();
+
+          // Initial render
+          applyFilters();
+        } catch (error) {
+          console.error("Error loading satellite table data:", error);
+          const tableBody = document.getElementById("satelliteTableBody");
+          tableBody.innerHTML =
+            '<tr><td colspan="7" style="text-align:center;color:#ff6b6b;">Error loading satellite data</td></tr>';
+        }
+      }
+
+      // Populate owner dropdown with unique countries
+      function populateOwnerFilter() {
+        const owners = new Set();
+        allSatellites.forEach((sat) => {
+          const owner = sat.Owner || sat.State;
+          if (owner && owner.trim()) {
+            owners.add(owner.trim());
+          }
+        });
+
+        const sortedOwners = Array.from(owners).sort();
+        const select = document.getElementById("ownerFilter");
+
+        sortedOwners.forEach((owner) => {
+          const option = document.createElement("option");
+          option.value = owner;
+          option.textContent = owner;
+          select.appendChild(option);
+        });
+      }
+
+      // Update statistics
+      function updateStats() {
+        const total = allSatellites.length;
+        const active = allSatellites.filter(
+          (sat) => sat.STATUS === "ACTIVE"
+        ).length;
+        const inactive = total - active;
+
+        document.getElementById("totalCount").textContent =
+          total.toLocaleString();
+        document.getElementById("activeCount").textContent =
+          active.toLocaleString();
+        document.getElementById("inactiveCount").textContent =
+          inactive.toLocaleString();
+      }
+
+      // Apply all filters
+      function applyFilters() {
+        filteredSatellites = allSatellites.filter((sat) => {
+          // Search filter
+          if (filters.search) {
+            const search = filters.search.toLowerCase();
+            const name = (sat.Name || "").toLowerCase();
+            const norad = (sat.JCAT || "").toString();
+            const owner = (sat.Owner || sat.State || "").toLowerCase();
+
+            if (
+              !name.includes(search) &&
+              !norad.includes(search) &&
+              !owner.includes(search)
+            ) {
+              return false;
+            }
+          }
+
+          // Status filter
+          if (filters.status !== "all" && sat.STATUS !== filters.status) {
+            return false;
+          }
+
+          // Type filter
+          if (filters.type !== "all") {
+            const type = (sat.Type || "").trim();
+            if (filters.type === "P" && !type.startsWith("P")) return false;
+            if (filters.type === "R" && !type.startsWith("R")) return false;
+            if (filters.type === "C" && !type.startsWith("C")) return false;
+          }
+
+          // Owner filter
+          if (filters.owner !== "all") {
+            const owner = sat.Owner || sat.State || "";
+            if (owner.trim() !== filters.owner) return false;
+          }
+
+          return true;
+        });
+
+        // Sort
+        sortSatellites();
+
+        // Reset to first page
+        currentPage = 1;
+
+        // Update UI
+        renderTable();
+        updatePagination();
+        document.getElementById("showingCount").textContent =
+          filteredSatellites.length.toLocaleString();
+      }
+
+      // Sort satellites
+      function sortSatellites() {
+        switch (filters.sort) {
+          case "name":
+            filteredSatellites.sort((a, b) =>
+              (a.Name || "").localeCompare(b.Name || "")
+            );
+            break;
+          case "date-desc":
+            filteredSatellites.sort((a, b) => {
+              const dateA = new Date(a.LDate || "1900-01-01");
+              const dateB = new Date(b.LDate || "1900-01-01");
+              return dateB - dateA;
+            });
+            break;
+          case "date-asc":
+            filteredSatellites.sort((a, b) => {
+              const dateA = new Date(a.LDate || "1900-01-01");
+              const dateB = new Date(b.LDate || "1900-01-01");
+              return dateA - dateB;
+            });
+            break;
+          case "norad":
+            filteredSatellites.sort(
+              (a, b) => parseInt(a.JCAT || 0) - parseInt(b.JCAT || 0)
+            );
+            break;
+        }
+      }
+
+      // Render table with pagination
+      function renderTable() {
+        const tableBody = document.getElementById("satelliteTableBody");
+
+        if (filteredSatellites.length === 0) {
+          tableBody.innerHTML =
+            '<tr><td colspan="7" style="text-align:center;color:#999;">No satellites match your filters</td></tr>';
+          return;
+        }
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(
+          startIndex + itemsPerPage,
+          filteredSatellites.length
+        );
+        const pageSatellites = filteredSatellites.slice(startIndex, endIndex);
+
+        const tableHTML = pageSatellites
+          .map((sat) => {
+            const name = sat.Name || "Unknown";
+            const norad = sat.JCAT || "N/A";
+            const type = getTypeLabel(sat.Type || "");
+            const owner = sat.Owner || sat.State || "Unknown";
+            const launchDate = formatDate(sat.LDate);
+            const status = sat.STATUS || "INACTIVE";
+            const dest = sat.Dest || sat.Primary || "Unknown";
+
+            return `
+                    <tr>
+                        <td><strong>${name}</strong></td>
+                        <td>${norad}</td>
+                        <td>${type}</td>
+                        <td>${owner}</td>
+                        <td>${launchDate}</td>
+                        <td><span class="status-badge status-${status.toLowerCase()}">${status}</span></td>
+                        <td>${dest}</td>
+                    </tr>
+                `;
+          })
+          .join("");
+
+        tableBody.innerHTML = tableHTML;
+        document.getElementById("satelliteCount").textContent =
+          filteredSatellites.length.toLocaleString();
+      }
+
+      // Get readable type label
+      function getTypeLabel(type) {
+        if (!type) return "Unknown";
+        if (type.startsWith("P")) return "Payload";
+        if (type.startsWith("R")) return "Rocket Body";
+        if (type.startsWith("C")) return "Debris";
+        return type;
+      }
+
+      // Format date
+      function formatDate(dateStr) {
+        if (!dateStr || dateStr === "-") return "Unknown";
+        try {
+          // Handle various date formats
+          const date = new Date(dateStr);
+          if (isNaN(date.getTime())) return dateStr;
+          return date.toISOString().split("T")[0];
+        } catch {
+          return dateStr;
+        }
+      }
+
+      // Update pagination controls
+      function updatePagination() {
+        const totalPages = Math.ceil(filteredSatellites.length / itemsPerPage);
+
+        document.getElementById(
+          "pageInfo"
+        ).textContent = `Page ${currentPage} of ${totalPages}`;
+
+        document.getElementById("firstPage").disabled = currentPage === 1;
+        document.getElementById("prevPage").disabled = currentPage === 1;
+        document.getElementById("nextPage").disabled =
+          currentPage === totalPages;
+        document.getElementById("lastPage").disabled =
+          currentPage === totalPages;
+      }
+
+      // Event listeners
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeTableData();
+
+        // Search
+        document
+          .getElementById("registrySearch")
+          .addEventListener("input", function (e) {
+            filters.search = e.target.value;
+            applyFilters();
+          });
+
+        // Status filters
+        document
+          .querySelectorAll(".filter-button[data-status]")
+          .forEach((button) => {
+            button.addEventListener("click", function () {
+              document
+                .querySelectorAll(".filter-button[data-status]")
+                .forEach((b) => b.classList.remove("active"));
+              this.classList.add("active");
+              filters.status = this.dataset.status;
+              applyFilters();
+            });
+          });
+
+        // Type filters
+        document
+          .querySelectorAll(".filter-button[data-type]")
+          .forEach((button) => {
+            button.addEventListener("click", function () {
+              document
+                .querySelectorAll(".filter-button[data-type]")
+                .forEach((b) => b.classList.remove("active"));
+              this.classList.add("active");
+              filters.type = this.dataset.type;
+              applyFilters();
+            });
+          });
+
+        // Owner filter
+        document
+          .getElementById("ownerFilter")
+          .addEventListener("change", function () {
+            filters.owner = this.value;
+            applyFilters();
+          });
+
+        // Sort filter
+        document
+          .getElementById("sortFilter")
+          .addEventListener("change", function () {
+            filters.sort = this.value;
+            applyFilters();
+          });
+
+        // Pagination
+        document.getElementById("firstPage").addEventListener("click", () => {
+          currentPage = 1;
+          renderTable();
+          updatePagination();
+        });
+
+        document.getElementById("prevPage").addEventListener("click", () => {
+          if (currentPage > 1) {
+            currentPage--;
+            renderTable();
+            updatePagination();
+          }
+        });
+
+        document.getElementById("nextPage").addEventListener("click", () => {
+          const totalPages = Math.ceil(
+            filteredSatellites.length / itemsPerPage
+          );
+          if (currentPage < totalPages) {
+            currentPage++;
+            renderTable();
+            updatePagination();
+          }
+        });
+
+        document.getElementById("lastPage").addEventListener("click", () => {
+          currentPage = Math.ceil(filteredSatellites.length / itemsPerPage);
+          renderTable();
+          updatePagination();
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE ORB - Satellite Operations Platform</title>
+    <!-- Cesium for 3D Globe -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Cesium.js"></script>
+    <link
+      href="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Widgets/widgets.css"
+      rel="stylesheet"
+    />
+    <!-- Satellite.js for orbital mechanics -->
+    <script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
+    <!-- Chart.js for statistics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: #121212;
+        color: #eaeaea;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      /* Header Styles */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(18, 18, 18, 0.95);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(234, 234, 234, 0.15);
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: #eaeaea;
+      }
+
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 3rem;
+      }
+
+      .nav-link {
+        color: #eaeaea;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: #e85d04;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #e85d04, #f77f00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+
+      /* Main Content */
+      .main {
+        margin-top: 80px;
+      }
+
+      /* Hero Section */
+      .hero {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        background: radial-gradient(
+          ellipse at center,
+          #111111 0%,
+          #000000 100%
+        );
+      }
+
+      .hero-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+      }
+
+      .hero-text h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 4rem;
+        font-weight: 600;
+        line-height: 1.1;
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, #ffffff, #cccccc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .hero-text p {
+        font-size: 1.2rem;
+        color: #cccccc;
+        margin-bottom: 3rem;
+        line-height: 1.8;
+      }
+
+      .hero-visual {
+        position: relative;
+        height: 600px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .orb {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 30% 30%,
+          #ff8c42,
+          #ff6b35,
+          #cc4829
+        );
+        box-shadow: 0 0 100px rgba(255, 107, 53, 0.5);
+        animation: pulse 3s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .satellite-bg {
+        position: absolute;
+        top: 0;
+        right: -50%;
+        width: 800px;
+        height: 600px;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect fill="%23111" width="400" height="300"/><g stroke="%23333" stroke-width="1" fill="none"><circle cx="200" cy="150" r="80"/><line x1="120" y1="150" x2="280" y2="150"/><line x1="200" y1="70" x2="200" y2="230"/><rect x="180" y="130" width="40" height="40" fill="%23222"/></g></svg>')
+          no-repeat center;
+        background-size: contain;
+        opacity: 0.3;
+      }
+
+      .cta-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        background: linear-gradient(135deg, #ff6b35, #ff8c42);
+        color: #000;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      .cta-primary:hover {
+        transform: translateY(-2px);
+      }
+
+      /* Dashboard Section */
+      .dashboard {
+        padding: 6rem 0;
+        background: #0a0a0a;
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+      }
+
+      .section-header h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .section-header p {
+        color: #cccccc;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 4rem;
+      }
+
+      .dashboard-card {
+        background: #111111;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 2rem;
+        transition: border-color 0.3s ease;
+      }
+
+      .dashboard-card:hover {
+        border-color: #ff6b35;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+      }
+
+      .card-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #ff6b35;
+        display: block;
+      }
+
+      .stat-label {
+        color: #cccccc;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* 3D Globe Section */
+      .globe-section {
+        padding: 6rem 0;
+        background: #000000;
+      }
+
+      .globe-container {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 3rem;
+        height: 600px;
+      }
+
+      .globe-controls {
+        background: #111111;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 2rem;
+      }
+
+      .control-group {
+        margin-bottom: 2rem;
+      }
+
+      .control-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.9rem;
+      }
+
+      .control-input {
+        width: 100%;
+        background: #222;
+        border: 1px solid #444;
+        border-radius: 6px;
+        padding: 0.75rem;
+        color: #ffffff;
+        font-family: inherit;
+      }
+
+      .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .filter-btn {
+        background: #222;
+        border: 1px solid #444;
+        color: #cccccc;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .filter-btn.active,
+      .filter-btn:hover {
+        background: #ff6b35;
+        border-color: #ff6b35;
+        color: #000;
+      }
+
+      #globe-canvas {
+        background: #000;
+        border: 1px solid #333;
+        border-radius: 12px;
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      /* Cesium overrides */
+      .cesium-viewer .cesium-widget-credits {
+        display: none !important;
+      }
+
+      .cesium-viewer-toolbar {
+        display: none !important;
+      }
+
+      /* Satellite Registry Table */
+      .registry-section {
+        padding: 6rem 0;
+        background: #0a0a0a;
+      }
+
+      .table-container {
+        background: #111111;
+        border: 1px solid #333;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #333;
+      }
+
+      .search-input {
+        background: #222;
+        border: 1px solid #444;
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        color: #ffffff;
+        width: 300px;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        border-bottom: 1px solid #333;
+      }
+
+      .data-table th {
+        background: #222;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.9rem;
+      }
+
+      .data-table tr:hover {
+        background: rgba(255, 107, 53, 0.05);
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .status-active {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+      }
+
+      .status-inactive {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+      }
+
+      .status-deorbited {
+        background: rgba(107, 114, 128, 0.2);
+        color: #6b7280;
+      }
+
+      /* Chart Container */
+      .chart-container {
+        position: relative;
+        height: 300px;
+        margin-top: 1rem;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1024px) {
+        .hero-content {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .globe-container {
+          grid-template-columns: 1fr;
+        }
+
+        .globe-controls {
+          order: 2;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .nav-menu {
+          display: none;
+        }
+
+        .hero-text h1 {
+          font-size: 2.5rem;
+        }
+
+        .container {
+          padding: 0 1rem;
+        }
+      }
+
+      /* Divider Lines */
+      .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #333, transparent);
+        margin: 4rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <a href="dashboard.html" class="logo">THE ORB</a>
+        <ul class="nav-menu">
+          <li>
+            <a href="dashboard.html" class="nav-link active">Dashboard</a>
+          </li>
+          <li>
+            <a href="tracker_v2.html" class="nav-link">Tracker</a>
+          </li>
+          <li><a href="registry.html" class="nav-link">Registry</a></li>
+          <li><a href="insurance_new.html" class="nav-link">Insurance</a></li>
+          <li><a href="compliance.html" class="nav-link">Compliance</a></li>
+        </ul>
+        <div class="user-profile">
+          <div class="user-avatar">SA</div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main">
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-text">
+              <h1>Unified Satellite Operations Excellence</h1>
+              <p>
+                Advanced satellite management platform providing comprehensive
+                oversight, real-time tracking, and intelligent analytics for
+                satellite owners, operators, insurers, and regulators worldwide.
+              </p>
+              <button
+                class="cta-primary"
+                onclick="scrollToSection('dashboard')"
+              >
+                EXPLORE PLATFORM
+                <span>→</span>
+              </button>
+            </div>
+            <div class="hero-visual">
+              <div class="orb"></div>
+              <div class="satellite-bg"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard Overview -->
+      <section id="dashboard" class="dashboard">
+        <div class="container">
+          <div class="section-header">
+            <h2>Mission Control Dashboard</h2>
+            <p>
+              Real-time overview of your satellite operations, fleet status, and
+              critical mission parameters
+            </p>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="dashboard-card">
+              <div class="card-header">
+                <h3 class="card-title">Fleet Overview</h3>
+                <span class="status-badge status-active"
+                  >All Systems Operational</span
+                >
+              </div>
+              <div class="card-stats">
+                <div class="stat-item">
+                  <span class="stat-number">847</span>
+                  <span class="stat-label">Active Satellites</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">23</span>
+                  <span class="stat-label">Launches This Month</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">99.7%</span>
+                  <span class="stat-label">Uptime</span>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="fleetChart"></canvas>
+              </div>
+            </div>
+
+            <div class="dashboard-card">
+              <div class="card-header">
+                <h3 class="card-title">Insurance & Risk</h3>
+                <span class="status-badge status-active">Fully Covered</span>
+              </div>
+              <div class="card-stats">
+                <div class="stat-item">
+                  <span class="stat-number">$2.4B</span>
+                  <span class="stat-label">Total Coverage</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">12</span>
+                  <span class="stat-label">Active Claims</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">Low</span>
+                  <span class="stat-label">Risk Level</span>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="insuranceChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- 3D Satellite Radar -->
+      <section id="satellite-radar" class="globe-section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Global Satellite Radar</h2>
+            <p>
+              Real-time 3D visualization of satellite positions and orbital
+              trajectories
+            </p>
+          </div>
+
+          <div class="globe-container">
+            <div class="globe-controls">
+              <div class="control-group">
+                <label class="control-label">Search Satellites</label>
+                <input
+                  type="text"
+                  class="control-input"
+                  placeholder="Enter satellite name or NORAD ID"
+                  id="satelliteSearch"
+                />
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Filter by Type</label>
+                <div class="filter-buttons">
+                  <button class="filter-btn active" data-filter="all">
+                    All
+                  </button>
+                  <button class="filter-btn" data-filter="communication">
+                    Comms
+                  </button>
+                  <button class="filter-btn" data-filter="weather">
+                    Weather
+                  </button>
+                  <button class="filter-btn" data-filter="navigation">
+                    Nav
+                  </button>
+                  <button class="filter-btn" data-filter="scientific">
+                    Science
+                  </button>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Orbit Type</label>
+                <div class="filter-buttons">
+                  <button class="filter-btn active" data-orbit="all">
+                    All
+                  </button>
+                  <button class="filter-btn" data-orbit="leo">LEO</button>
+                  <button class="filter-btn" data-orbit="meo">MEO</button>
+                  <button class="filter-btn" data-orbit="geo">GEO</button>
+                  <button class="filter-btn" data-orbit="heo">HEO</button>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Status</label>
+                <div class="filter-buttons">
+                  <button class="filter-btn active" data-status="all">
+                    All
+                  </button>
+                  <button class="filter-btn" data-status="active">
+                    Active
+                  </button>
+                  <button class="filter-btn" data-status="inactive">
+                    Inactive
+                  </button>
+                  <button class="filter-btn" data-status="debris">
+                    Debris
+                  </button>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <button
+                  class="cta-primary"
+                  style="width: 100%"
+                  onclick="resetGlobe()"
+                >
+                  RESET VIEW
+                </button>
+              </div>
+            </div>
+
+            <div id="globe-canvas"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- Satellite Registry -->
+      <section id="registry" class="registry-section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Satellite Registry</h2>
+            <p>
+              Comprehensive database of registered satellites with detailed
+              specifications and operational data
+            </p>
+          </div>
+
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Active Satellites</h3>
+              <input
+                type="text"
+                class="search-input"
+                placeholder="Search satellites..."
+                id="registrySearch"
+              />
+            </div>
+            <table class="data-table" id="satelliteTable">
+              <thead>
+                <tr>
+                  <th>Satellite Name</th>
+                  <th>NORAD ID</th>
+                  <th>Type</th>
+                  <th>Epoch Date</th>
+                  <th>Orbit Type</th>
+                  <th>Altitude</th>
+                  <th>Status</th>
+                  <th>Orbital Period</th>
+                </tr>
+              </thead>
+              <tbody id="satelliteTableBody">
+                <!-- Table rows will be populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Sample satellite data
+      const satellites = [
+        {
+          name: "ISS (ZARYA)",
+          noradId: "25544",
+          owner: "Multinational",
+          launchDate: "1998-11-20",
+          orbitType: "LEO",
+          purpose: "Crewed Space Station",
+          status: "active",
+          insurance: "Government",
+        },
+        {
+          name: "HUBBLE SPACE TELESCOPE",
+          noradId: "20580",
+          owner: "NASA",
+          launchDate: "1990-04-24",
+          orbitType: "LEO",
+          purpose: "Space Telescope",
+          status: "active",
+          insurance: "Government",
+        },
+        {
+          name: "GPS IIF-1",
+          noradId: "37753",
+          owner: "US Air Force",
+          launchDate: "2010-05-27",
+          orbitType: "MEO",
+          purpose: "Navigation",
+          status: "active",
+          insurance: "$1.2B",
+        },
+        {
+          name: "INTELSAT 34",
+          noradId: "41581",
+          owner: "Intelsat",
+          launchDate: "2016-08-24",
+          orbitType: "GEO",
+          purpose: "Communications",
+          status: "active",
+          insurance: "$450M",
+        },
+        {
+          name: "STARLINK-1007",
+          noradId: "44713",
+          owner: "SpaceX",
+          launchDate: "2019-11-11",
+          orbitType: "LEO",
+          purpose: "Communications",
+          status: "active",
+          insurance: "$5M",
+        },
+        {
+          name: "WEATHER SAT-3",
+          noradId: "43013",
+          owner: "NOAA",
+          launchDate: "2018-03-01",
+          orbitType: "GEO",
+          purpose: "Weather",
+          status: "inactive",
+          insurance: "$890M",
+        },
+        {
+          name: "COSMOS 2251 DEB",
+          noradId: "34454",
+          owner: "Russia",
+          launchDate: "2009-02-10",
+          orbitType: "LEO",
+          purpose: "Debris",
+          status: "deorbited",
+          insurance: "N/A",
+        },
+      ];
+
+      // Initialize the application
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeTableData();
+        initializeCharts();
+        initializeGlobe();
+        initializeEventListeners();
+      });
+
+      // Populate satellite table with real CSV data
+      async function initializeTableData() {
+        try {
+          const response = await fetch(
+            "../../data/satellites_with_tle_n2yo.csv"
+          );
+          const csvText = await response.text();
+          const satelliteData = parseCSV(csvText);
+
+          const tableBody = document.getElementById("satelliteTableBody");
+
+          const tableHTML = satelliteData
+            .map((sat) => {
+              // Determine orbit type from semi-major axis (altitude)
+              const altitude = parseFloat(sat.SEMIMAJOR_AXIS || 0) - 6371; // Earth radius in km
+              let orbitType = "LEO";
+              if (altitude > 30000) orbitType = "GEO";
+              else if (altitude > 2000) orbitType = "MEO";
+
+              // Extract launch date from EPOCH (format: 2024-10-04T12:34:56)
+              const launchDate = sat.EPOCH
+                ? sat.EPOCH.split("T")[0]
+                : "Unknown";
+
+              // Determine status based on eccentricity and mean motion
+              const eccentricity = parseFloat(sat.ECCENTRICITY || 0);
+              const meanMotion = parseFloat(sat.MEAN_MOTION || 0);
+              let status = "active";
+              if (meanMotion < 0.1) status = "inactive";
+              if (eccentricity > 0.5) status = "deorbited";
+
+              return `
+                        <tr>
+                            <td>${sat.OBJECT_NAME || "Unknown"}</td>
+                            <td>${sat.NORAD_CAT_ID || "N/A"}</td>
+                            <td>${sat.OBJECT_TYPE || "Unknown"}</td>
+                            <td>${launchDate}</td>
+                            <td>${orbitType}</td>
+                            <td>${Math.round(altitude)} km</td>
+                            <td><span class="status-badge status-${status}">${status.toUpperCase()}</span></td>
+                            <td>${
+                              sat.PERIOD
+                                ? parseFloat(sat.PERIOD).toFixed(2) + " min"
+                                : "N/A"
+                            }</td>
+                        </tr>
+                    `;
+            })
+            .join("");
+
+          tableBody.innerHTML = tableHTML;
+        } catch (error) {
+          console.error("Error loading satellite table data:", error);
+          const tableBody = document.getElementById("satelliteTableBody");
+          tableBody.innerHTML =
+            '<tr><td colspan="8" style="text-align:center;color:#ff6b6b;">Error loading satellite data</td></tr>';
+        }
+      }
+
+      // Old mock data removed - now using real CSV data
+
+      // Legacy table function (kept for reference)
+      function initializeTableDataOld() {
+        const tableBody = document.getElementById("satelliteTableBody");
+        const tableHTML = satellites
+          .map(
+            (sat) => `
+                <tr>
+                    <td>${sat.name}</td>
+                    <td>${sat.noradId}</td>
+                    <td>${sat.owner}</td>
+                    <td>${sat.launchDate}</td>
+                    <td>${sat.orbitType}</td>
+                    <td>${sat.purpose}</td>
+                    <td><span class="status-badge status-${
+                      sat.status
+                    }">${sat.status.toUpperCase()}</span></td>
+                    <td>${sat.insurance}</td>
+                </tr>
+            `
+          )
+          .join("");
+
+        tableBody.innerHTML = tableHTML;
+      }
+
+      // Initialize charts
+      function initializeCharts() {
+        // Fleet Status Chart
+        const fleetCtx = document.getElementById("fleetChart").getContext("2d");
+        new Chart(fleetCtx, {
+          type: "doughnut",
+          data: {
+            labels: ["Active", "Inactive", "Deorbited"],
+            datasets: [
+              {
+                data: [847, 123, 45],
+                backgroundColor: ["#22c55e", "#ef4444", "#6b7280"],
+                borderColor: "#000",
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  color: "#cccccc",
+                  padding: 20,
+                },
+              },
+            },
+          },
+        });
+
+        // Insurance Coverage Chart
+        const insuranceCtx = document
+          .getElementById("insuranceChart")
+          .getContext("2d");
+        new Chart(insuranceCtx, {
+          type: "bar",
+          data: {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            datasets: [
+              {
+                label: "Claims ($M)",
+                data: [12, 8, 15, 6, 9, 11],
+                backgroundColor: "#ff6b35",
+                borderColor: "#ff8c42",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  color: "#cccccc",
+                },
+              },
+            },
+            scales: {
+              x: {
+                ticks: { color: "#cccccc" },
+                grid: { color: "#333" },
+              },
+              y: {
+                ticks: { color: "#cccccc" },
+                grid: { color: "#333" },
+              },
+            },
+          },
+        });
+      }
+
+      // Initialize 3D Globe with Cesium
+      let globeViewer;
+      let globalSatellites = [];
+      let trackedSatellite = null;
+      let isTracking = false;
+
+      function initializeGlobe() {
+        const container = document.getElementById("globe-canvas");
+
+        // Create Cesium Viewer
+        globeViewer = new Cesium.Viewer(container, {
+          imageryProvider: false,
+          baseLayerPicker: false,
+          geocoder: false,
+          timeline: false,
+          animation: false,
+          sceneModePicker: false,
+          homeButton: false,
+          navigationHelpButton: false,
+          fullscreenButton: false,
+          selectionIndicator: true,
+          infoBox: true,
+        });
+
+        // Dark grey ocean
+        globeViewer.scene.globe.baseColor =
+          Cesium.Color.fromCssColorString("#2b2b2b");
+
+        // Load countries
+        Cesium.GeoJsonDataSource.load(
+          "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
+        ).then(function (ds) {
+          globeViewer.dataSources.add(ds);
+
+          const entities = ds.entities.values;
+          for (let i = 0; i < entities.length; i++) {
+            const entity = entities[i];
+            if (Cesium.defined(entity.polygon)) {
+              entity.polygon.material = Cesium.Color.GREY;
+              entity.polygon.outline = true;
+              entity.polygon.outlineColor = Cesium.Color.WHITE;
+              entity.polygon.outlineWidth = 1.0;
+            }
+          }
+
+          globeViewer.zoomTo(ds);
+        });
+
+        // Zoom limiter
+        const minHeight = 10_000_000;
+        const maxHeight = 25_000_000;
+
+        globeViewer.scene.camera.moveEnd.addEventListener(function () {
+          const cameraHeight = Cesium.Cartographic.fromCartesian(
+            globeViewer.scene.camera.position
+          ).height;
+
+          if (cameraHeight < minHeight) {
+            globeViewer.scene.camera.moveBackward(minHeight - cameraHeight);
+          } else if (cameraHeight > maxHeight) {
+            globeViewer.scene.camera.moveForward(cameraHeight - maxHeight);
+          }
+        });
+
+        // Load satellite data
+        loadSatellitesOnGlobe();
+      }
+
+      // Parse CSV helper
+      function parseCSV(csvText) {
+        const lines = csvText.trim().split("\n");
+        const headers = lines[0].split(",");
+        const records = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(",");
+          const record = {};
+
+          headers.forEach((header, index) => {
+            record[header.trim()] = values[index] ? values[index].trim() : "";
+          });
+
+          if (record.TLE_LINE1 && record.TLE_LINE2) {
+            records.push(record);
+          }
+        }
+
+        return records;
+      }
+
+      // Load satellites on globe
+      async function loadSatellitesOnGlobe() {
+        try {
+          const response = await fetch(
+            "../../data/satellites_with_tle_n2yo.csv"
+          );
+          const csvText = await response.text();
+          const records = parseCSV(csvText);
+
+          console.log(`✓ Loaded ${records.length} satellites`);
+
+          const color = Cesium.Color.ORANGE;
+
+          records.forEach((record) => {
+            try {
+              const tleLine1 = record.TLE_LINE1;
+              const tleLine2 = record.TLE_LINE2;
+              const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+
+              const name =
+                record.N2YO_SAT_NAME ||
+                record.OBJECT_NAME ||
+                `SAT-${record.NORAD_CAT_ID}`;
+
+              const now = new Date();
+              const positionAndVelocity = satellite.propagate(satrec, now);
+
+              if (positionAndVelocity.position && !positionAndVelocity.error) {
+                const positionEci = positionAndVelocity.position;
+                const gmst = satellite.gstime(now);
+                const positionGd = satellite.eciToGeodetic(positionEci, gmst);
+
+                const longitude = satellite.degreesLong(positionGd.longitude);
+                const latitude = satellite.degreesLat(positionGd.latitude);
+                const altitudeKm = positionGd.height;
+
+                // Scale altitude
+                let scaledAltitude;
+                if (altitudeKm < 2000) {
+                  scaledAltitude = altitudeKm * 1000;
+                } else if (altitudeKm < 10000) {
+                  scaledAltitude = (2000 + (altitudeKm - 2000) * 0.4) * 1000;
+                } else {
+                  scaledAltitude = (5200 + (altitudeKm - 10000) * 0.2) * 1000;
+                }
+
+                const meanMotion = parseFloat(record.MEAN_MOTION) || 15;
+                const orbitalPeriod = (1440 / meanMotion).toFixed(1);
+
+                const entity = globeViewer.entities.add({
+                  name: name,
+                  description: `
+                                    <div style="font-family: sans-serif;">
+                                        <h3>${name}</h3>
+                                        <p><strong>NORAD ID:</strong> ${
+                                          record.NORAD_CAT_ID
+                                        }</p>
+                                        <p><strong>Altitude:</strong> ${altitudeKm.toFixed(
+                                          2
+                                        )} km</p>
+                                        <p><strong>Orbital Period:</strong> ${orbitalPeriod} min</p>
+                                        <p><strong>Inclination:</strong> ${parseFloat(
+                                          record.INCLINATION
+                                        ).toFixed(2)}°</p>
+                                        <p><strong>Epoch:</strong> ${
+                                          record.EPOCH
+                                        }</p>
+                                    </div>
+                                `,
+                  position: Cesium.Cartesian3.fromDegrees(
+                    longitude,
+                    latitude,
+                    scaledAltitude
+                  ),
+                  point: {
+                    pixelSize: 6,
+                    color: color,
+                    outlineColor: Cesium.Color.WHITE,
+                    outlineWidth: 1,
+                  },
+                  box: {
+                    dimensions: new Cesium.Cartesian3(20000, 20000, 20000),
+                    material: color.withAlpha(0.9),
+                    outline: true,
+                    outlineColor: Cesium.Color.WHITE,
+                  },
+                  label: {
+                    text: name,
+                    font: "10px sans-serif",
+                    fillColor: Cesium.Color.WHITE,
+                    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                    outlineWidth: 2,
+                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                    pixelOffset: new Cesium.Cartesian2(0, -15),
+                    show: false,
+                  },
+                });
+
+                globalSatellites.push({
+                  entity: entity,
+                  satrec: satrec,
+                  name: name,
+                  noradId: record.NORAD_CAT_ID,
+                  record: record,
+                  realAltitudeKm: altitudeKm,
+                });
+              }
+            } catch (error) {
+              console.warn(
+                `Failed to load satellite ${record.NORAD_CAT_ID}:`,
+                error
+              );
+            }
+          });
+
+          console.log(`✓ Added ${globalSatellites.length} satellites to globe`);
+
+          // Start updating positions
+          startSatelliteUpdates();
+        } catch (error) {
+          console.error("Error loading satellites:", error);
+        }
+      }
+
+      // Update satellite positions
+      function startSatelliteUpdates() {
+        globeViewer.clock.onTick.addEventListener(function (clock) {
+          const now = new Date();
+
+          globalSatellites.forEach((sat) => {
+            try {
+              const positionAndVelocity = satellite.propagate(sat.satrec, now);
+
+              if (positionAndVelocity.position && !positionAndVelocity.error) {
+                const positionEci = positionAndVelocity.position;
+                const gmst = satellite.gstime(now);
+                const positionGd = satellite.eciToGeodetic(positionEci, gmst);
+
+                const longitude = satellite.degreesLong(positionGd.longitude);
+                const latitude = satellite.degreesLat(positionGd.latitude);
+                const altitudeKm = positionGd.height;
+
+                let scaledAltitude;
+                if (altitudeKm < 2000) {
+                  scaledAltitude = altitudeKm * 1000;
+                } else if (altitudeKm < 10000) {
+                  scaledAltitude = (2000 + (altitudeKm - 2000) * 0.4) * 1000;
+                } else {
+                  scaledAltitude = (5200 + (altitudeKm - 10000) * 0.2) * 1000;
+                }
+
+                sat.entity.position = Cesium.Cartesian3.fromDegrees(
+                  longitude,
+                  latitude,
+                  scaledAltitude
+                );
+                sat.realAltitudeKm = altitudeKm;
+              }
+            } catch (error) {
+              // Skip errors
+            }
+          });
+
+          // Camera tracking
+          if (isTracking && trackedSatellite) {
+            const position = trackedSatellite.entity.position.getValue(
+              clock.currentTime
+            );
+            if (position) {
+              const cartographic = Cesium.Cartographic.fromCartesian(position);
+              const scaledAltitude = cartographic.height;
+
+              globeViewer.camera.lookAt(
+                position,
+                new Cesium.HeadingPitchRange(
+                  0,
+                  -Math.PI / 4,
+                  scaledAltitude * 2.5
+                )
+              );
+            }
+          }
+        });
+
+        // Handle satellite selection
+        globeViewer.selectedEntityChanged.addEventListener(function (
+          selectedEntity
+        ) {
+          if (selectedEntity && selectedEntity.name) {
+            const sat = globalSatellites.find(
+              (s) => s.entity === selectedEntity
+            );
+            if (sat) {
+              trackedSatellite = sat;
+              isTracking = true;
+              sat.entity.label.show = true;
+
+              const position = sat.entity.position.getValue(
+                Cesium.JulianDate.now()
+              );
+              if (position) {
+                const cartographic =
+                  Cesium.Cartographic.fromCartesian(position);
+                const altitude = cartographic.height;
+
+                globeViewer.flyTo(selectedEntity, {
+                  duration: 2,
+                  offset: new Cesium.HeadingPitchRange(
+                    0,
+                    -Math.PI / 4,
+                    altitude * 2.5
+                  ),
+                });
+              }
+            }
+          } else if (!selectedEntity) {
+            if (trackedSatellite) {
+              trackedSatellite = null;
+              isTracking = false;
+            }
+          }
+        });
+      }
+
+      // Initialize event listeners
+      function initializeEventListeners() {
+        // Navigation
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            document
+              .querySelectorAll(".nav-link")
+              .forEach((l) => l.classList.remove("active"));
+            this.classList.add("active");
+
+            const target = this.getAttribute("href").substring(1);
+            scrollToSection(target);
+          });
+        });
+
+        // Filter buttons
+        document.querySelectorAll(".filter-btn").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const group = this.parentElement;
+            group
+              .querySelectorAll(".filter-btn")
+              .forEach((b) => b.classList.remove("active"));
+            this.classList.add("active");
+
+            // Apply filter logic here
+            const filterType =
+              this.dataset.filter || this.dataset.orbit || this.dataset.status;
+            console.log("Filter applied:", filterType);
+          });
+        });
+
+        // Search functionality
+        const registrySearch = document.getElementById("registrySearch");
+        registrySearch.addEventListener("input", function () {
+          filterTable(this.value.toLowerCase());
+        });
+
+        const satelliteSearch = document.getElementById("satelliteSearch");
+        satelliteSearch.addEventListener("input", function () {
+          // Search satellite in 3D view
+          console.log("Searching for satellite:", this.value);
+        });
+      }
+
+      // Filter table function
+      function filterTable(searchTerm) {
+        const tableBody = document.getElementById("satelliteTableBody");
+        const rows = tableBody.querySelectorAll("tr");
+
+        rows.forEach((row) => {
+          const text = row.textContent.toLowerCase();
+          if (text.includes(searchTerm)) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      // Smooth scrolling function
+      function scrollToSection(targetId) {
+        const element = document.getElementById(targetId);
+        if (element) {
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }
+
+      // Reset globe view
+      function resetGlobe() {
+        if (window.globeScene) {
+          window.globeScene.camera.position.set(0, 0, 15);
+          window.globeScene.earth.rotation.set(0, 0, 0);
+          console.log("Globe view reset");
+        }
+      }
+
+      // Responsive handling
+      window.addEventListener("resize", function () {
+        const container = document.getElementById("globe-canvas");
+        const canvas = container.querySelector("canvas");
+        if (canvas && window.globeScene) {
+          canvas.width = container.clientWidth;
+          canvas.height = container.clientHeight;
+        }
+      });
+
+      // Add some interactive features
+      document.addEventListener("DOMContentLoaded", function () {
+        // Add hover effects to dashboard cards
+        document.querySelectorAll(".dashboard-card").forEach((card) => {
+          card.addEventListener("mouseenter", function () {
+            this.style.transform = "translateY(-5px)";
+            this.style.transition = "transform 0.3s ease";
+          });
+
+          card.addEventListener("mouseleave", function () {
+            this.style.transform = "translateY(0)";
+          });
+        });
+
+        // Add click to satellite table rows
+        document.querySelectorAll("#satelliteTable tbody tr").forEach((row) => {
+          row.addEventListener("click", function () {
+            // Highlight selected row
+            document
+              .querySelectorAll("#satelliteTable tbody tr")
+              .forEach((r) => {
+                r.style.backgroundColor = "";
+              });
+            this.style.backgroundColor = "rgba(255, 107, 53, 0.1)";
+
+            // Get satellite data
+            const satelliteName = this.cells[0].textContent;
+            console.log("Selected satellite:", satelliteName);
+
+            // You could show detailed view or focus on satellite in 3D view
+          });
+        });
+
+        // Add real-time clock
+        function updateClock() {
+          const now = new Date();
+          const timeString = now.toUTCString();
+
+          // Add time display to header if needed
+          const timeDisplay = document.createElement("div");
+          timeDisplay.style.color = "#cccccc";
+          timeDisplay.style.fontSize = "0.8rem";
+          timeDisplay.textContent = `UTC: ${timeString}`;
+
+          // Update every second
+          setTimeout(updateClock, 1000);
+        }
+        updateClock();
+      });
+
+      // Simulate live data updates
+      setInterval(function () {
+        // Update satellite positions (simulation)
+        const statsNumbers = document.querySelectorAll(".stat-number");
+        statsNumbers.forEach((stat) => {
+          if (stat.textContent.includes("%")) {
+            // Simulate uptime fluctuation
+            const current = parseFloat(stat.textContent);
+            const variation = (Math.random() - 0.5) * 0.2;
+            const newValue = Math.max(95, Math.min(100, current + variation));
+            stat.textContent = newValue.toFixed(1) + "%";
+          }
+        });
+      }, 5000);
+
+      // Add notification system
+      function showNotification(message, type = "info") {
+        const notification = document.createElement("div");
+        notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: ${type === "warning" ? "#ff6b35" : "#22c55e"};
+                color: #000;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 4000);
+      }
+
+      // Example notifications
+      setTimeout(() => {
+        showNotification("Satellite tracking system online", "info");
+      }, 2000);
+
+      setTimeout(() => {
+        showNotification("New satellite launched: COMM-SAT-7", "info");
+      }, 8000);
+
+      // Add CSS animation for notifications
+      const style = document.createElement("style");
+      style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            .loading-spinner {
+                border: 2px solid #333;
+                border-top: 2px solid #ff6b35;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                animation: spin 1s linear infinite;
+                display: inline-block;
+                margin-right: 0.5rem;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>

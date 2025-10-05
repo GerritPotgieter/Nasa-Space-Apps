@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>3D Satellite Tracker</title>
+    <!-- Cesium -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Cesium.js"></script>
+    <link
+      href="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Widgets/widgets.css"
+      rel="stylesheet"
+    />
+    <!-- Satellite.js for orbital mechanics -->
+    <script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
+    <style>
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      #loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 20px 40px;
+        border-radius: 10px;
+        font-family: sans-serif;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading">Loading satellite data...</div>
+    <div id="cesiumContainer"></div>
+    <script>
+      const viewer = new Cesium.Viewer("cesiumContainer", {
+        imageryProvider: false,
+        baseLayerPicker: false,
+        geocoder: false,
+        timeline: false,
+        animation: false,
+        sceneModePicker: false,
+      });
+
+      // Dark grey ocean
+      viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString("#2b2b2b");
+
+      let countriesLayer;
+      const countryLabels = [];
+
+      // Load countries
+      Cesium.GeoJsonDataSource.load(
+        "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
+      ).then(function (ds) {
+        countriesLayer = ds;
+        viewer.dataSources.add(countriesLayer);
+        viewer.zoomTo(countriesLayer);
+
+        // Explicitly style every polygon red with white borders
+        const entities = countriesLayer.entities.values;
+        for (let i = 0; i < entities.length; i++) {
+          const entity = entities[i];
+          if (Cesium.defined(entity.polygon)) {
+            entity.polygon.material = Cesium.Color.Grey;
+            entity.polygon.outline = true;
+            entity.polygon.outlineColor = Cesium.Color.WHITE;
+            entity.polygon.outlineWidth = 1.0;
+          }
+        }
+
+        addLabels(countriesLayer, Cesium.Color.WHITE, countryLabels);
+      });
+
+      // Helper: add labels at centroids
+      function addLabels(dataSource, color, labelStore) {
+        const entities = dataSource.entities.values;
+        for (let i = 0; i < entities.length; i++) {
+          const entity = entities[i];
+          if (
+            Cesium.defined(entity.polygon) &&
+            Cesium.defined(entity.properties) &&
+            Cesium.defined(entity.properties.name)
+          ) {
+            const name = entity.properties.name.getValue();
+            if (entity.polygon.hierarchy) {
+              const positions = entity.polygon.hierarchy.getValue(
+                Cesium.JulianDate.now()
+              ).positions;
+              const centroid =
+                Cesium.BoundingSphere.fromPoints(positions).center;
+              const cartographic = Cesium.Cartographic.fromCartesian(centroid);
+              const longitude = Cesium.Math.toDegrees(cartographic.longitude);
+              const latitude = Cesium.Math.toDegrees(cartographic.latitude);
+
+              const labelEntity = viewer.entities.add({
+                position: Cesium.Cartesian3.fromDegrees(longitude, latitude),
+                label: {
+                  text: name,
+                  font: "12px sans-serif",
+                  fillColor: color,
+                  style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                  outlineWidth: 2,
+                  verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                  pixelOffset: new Cesium.Cartesian2(0, -5),
+                  show: false, // hidden until zoomed in
+                },
+              });
+
+              labelStore.push(labelEntity);
+            }
+          }
+        }
+      }
+
+      // --- Zoom limiter ---
+      const minHeight = 10_000_000; // ~10,000 km
+      const maxHeight = 25_000_000; // ~25,000 km
+
+      viewer.scene.camera.moveEnd.addEventListener(function () {
+        const cameraHeight = Cesium.Cartographic.fromCartesian(
+          viewer.scene.camera.position
+        ).height;
+
+        if (cameraHeight < minHeight) {
+          viewer.scene.camera.moveBackward(minHeight - cameraHeight);
+        } else if (cameraHeight > maxHeight) {
+          viewer.scene.camera.moveForward(cameraHeight - maxHeight);
+        }
+      });
+
+      // --- Toggle labels visibility based on zoom ---
+      viewer.scene.camera.changed.addEventListener(function () {
+        const height = Cesium.Cartographic.fromCartesian(
+          viewer.scene.camera.position
+        ).height;
+
+        const showLabels = height < 12_000_000; // adjust threshold
+        for (let i = 0; i < countryLabels.length; i++) {
+          countryLabels[i].label.show = showLabels;
+        }
+      });
+
+      // ========================================
+      // REAL SATELLITE DATA FROM CSV + TLE
+      // ========================================
+      
+      const satellites = [];
+      let trackedSatellite = null;
+      let isTracking = false;
+
+      // Parse CSV helper
+      function parseCSV(csvText) {
+        const lines = csvText.trim().split('\n');
+        const headers = lines[0].split(',');
+        const records = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',');
+          const record = {};
+          
+          headers.forEach((header, index) => {
+            record[header.trim()] = values[index] ? values[index].trim() : '';
+          });
+          
+          // Only include satellites with valid TLE data
+          if (record.TLE_LINE1 && record.TLE_LINE2) {
+            records.push(record);
+          }
+        }
+
+        return records;
+      }
+
+      // Load and initialize satellites from CSV
+      async function loadSatellites() {
+        try {
+          const response = await fetch('../../data/satellites_with_tle_n2yo.csv');
+          const csvText = await response.text();
+          const records = parseCSV(csvText);
+          
+          console.log(`✓ Loaded ${records.length} satellites from CSV`);
+          
+          const color = Cesium.Color.ORANGE;
+          
+          records.forEach((record, index) => {
+            try {
+              // Parse TLE using satellite.js
+              const tleLine1 = record.TLE_LINE1;
+              const tleLine2 = record.TLE_LINE2;
+              const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+              
+              const name = record.N2YO_SAT_NAME || record.OBJECT_NAME || `SAT-${record.NORAD_CAT_ID}`;
+              
+              // Calculate initial position
+              const now = new Date();
+              const positionAndVelocity = satellite.propagate(satrec, now);
+              
+              if (positionAndVelocity.position && !positionAndVelocity.error) {
+                const positionEci = positionAndVelocity.position;
+                const gmst = satellite.gstime(now);
+                const positionGd = satellite.eciToGeodetic(positionEci, gmst);
+                
+                const longitude = satellite.degreesLong(positionGd.longitude);
+                const latitude = satellite.degreesLat(positionGd.latitude);
+                const altitudeKm = positionGd.height; // km
+                
+                // Scale altitude for better visibility
+                // Compress high orbits, keep LEO satellites reasonable
+                let scaledAltitude;
+                if (altitudeKm < 2000) {
+                  // LEO: 1:1 scaling
+                  scaledAltitude = altitudeKm * 1000;
+                } else if (altitudeKm < 10000) {
+                  // MEO: compress to 40%
+                  scaledAltitude = (2000 + (altitudeKm - 2000) * 0.4) * 1000;
+                } else {
+                  // GEO/HEO: compress heavily to 20%
+                  scaledAltitude = (5200 + (altitudeKm - 10000) * 0.2) * 1000;
+                }
+                
+                // Calculate orbital period from mean motion (revs per day)
+                const meanMotion = parseFloat(record.MEAN_MOTION) || 15;
+                const orbitalPeriod = (1440 / meanMotion).toFixed(1); // minutes
+                
+                // Generate orbital path (predict future positions)
+                const orbitPositions = [];
+                const orbitSamples = 120; // number of points in orbit
+                const periodMinutes = parseFloat(orbitalPeriod);
+                const timeStep = (periodMinutes * 60) / orbitSamples; // seconds per sample
+                
+                for (let j = 0; j < orbitSamples; j++) {
+                  const futureTime = new Date(now.getTime() + j * timeStep * 1000);
+                  const futurePV = satellite.propagate(satrec, futureTime);
+                  
+                  if (futurePV.position && !futurePV.error) {
+                    const futureEci = futurePV.position;
+                    const futureGmst = satellite.gstime(futureTime);
+                    const futureGd = satellite.eciToGeodetic(futureEci, futureGmst);
+                    
+                    const futureLon = satellite.degreesLong(futureGd.longitude);
+                    const futureLat = satellite.degreesLat(futureGd.latitude);
+                    const futureAltKm = futureGd.height;
+                    
+                    // Apply same altitude scaling
+                    let futureScaledAlt;
+                    if (futureAltKm < 2000) {
+                      futureScaledAlt = futureAltKm * 1000;
+                    } else if (futureAltKm < 10000) {
+                      futureScaledAlt = (2000 + (futureAltKm - 2000) * 0.4) * 1000;
+                    } else {
+                      futureScaledAlt = (5200 + (futureAltKm - 10000) * 0.2) * 1000;
+                    }
+                    
+                    orbitPositions.push(Cesium.Cartesian3.fromDegrees(futureLon, futureLat, futureScaledAlt));
+                  }
+                }
+                
+                // Create orbital path polyline
+                let orbitPath = null;
+                if (orbitPositions.length > 2) {
+                  orbitPath = viewer.entities.add({
+                    name: `${name}_orbit_path`,
+                    polyline: {
+                      positions: orbitPositions,
+                      width: 5,
+                      material: Cesium.Color.CYAN,
+                      clampToGround: false,
+                      arcType: Cesium.ArcType.NONE,
+                      show: false // Hidden by default, shown when satellite is selected
+                    }
+                  });
+                  console.log(`✓ Created orbit path for ${name} with ${orbitPositions.length} points`);
+                }
+                
+                // Create Cesium entity
+                const entity = viewer.entities.add({
+                  name: name,
+                  description: `
+                    <div style="font-family: sans-serif;">
+                      <h3>${name}</h3>
+                      <p><strong>NORAD ID:</strong> ${record.NORAD_CAT_ID}</p>
+                      <p><strong>Altitude:</strong> ${altitudeKm.toFixed(2)} km</p>
+                      <p><strong>Orbital Period:</strong> ${orbitalPeriod} minutes</p>
+                      <p><strong>Inclination:</strong> ${parseFloat(record.INCLINATION).toFixed(2)}°</p>
+                      <p><strong>Eccentricity:</strong> ${parseFloat(record.ECCENTRICITY).toFixed(6)}</p>
+                      <p><strong>Epoch:</strong> ${record.EPOCH}</p>
+                      <p><strong>Object ID:</strong> ${record.OBJECT_ID}</p>
+                      <p><strong>Status:</strong> Active</p>
+                    </div>
+                  `,
+                  position: Cesium.Cartesian3.fromDegrees(longitude, latitude, scaledAltitude),
+                  point: {
+                    pixelSize: 6,
+                    color: color,
+                    outlineColor: Cesium.Color.WHITE,
+                    outlineWidth: 1,
+                  },
+                  box: {
+                    dimensions: new Cesium.Cartesian3(20000, 20000, 20000),
+                    material: color.withAlpha(0.9),
+                    outline: true,
+                    outlineColor: Cesium.Color.WHITE,
+                  },
+                  label: {
+                    text: name,
+                    font: "10px sans-serif",
+                    fillColor: Cesium.Color.WHITE,
+                    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                    outlineWidth: 2,
+                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                    pixelOffset: new Cesium.Cartesian2(0, -15),
+                    show: false,
+                  },
+                });
+                
+                satellites.push({
+                  entity: entity,
+                  orbitPath: orbitPath,
+                  satrec: satrec,
+                  name: name,
+                  noradId: record.NORAD_CAT_ID,
+                  record: record,
+                  realAltitudeKm: altitudeKm
+                });
+              }
+            } catch (error) {
+              console.warn(`Failed to load satellite ${record.NORAD_CAT_ID}:`, error);
+            }
+          });
+          
+          console.log(`✓ Initialized ${satellites.length} satellites on globe`);
+          document.getElementById('loading').style.display = 'none';
+          
+        } catch (error) {
+          console.error('Error loading satellites:', error);
+          document.getElementById('loading').innerHTML = 'Error loading satellite data';
+        }
+      }
+
+      // Update satellite positions using TLE propagation
+      viewer.clock.onTick.addEventListener(function (clock) {
+        const now = new Date();
+        
+        satellites.forEach((sat) => {
+          try {
+            const positionAndVelocity = satellite.propagate(sat.satrec, now);
+            
+            if (positionAndVelocity.position && !positionAndVelocity.error) {
+              const positionEci = positionAndVelocity.position;
+              const gmst = satellite.gstime(now);
+              const positionGd = satellite.eciToGeodetic(positionEci, gmst);
+              
+              const longitude = satellite.degreesLong(positionGd.longitude);
+              const latitude = satellite.degreesLat(positionGd.latitude);
+              const altitudeKm = positionGd.height; // km
+              
+              // Apply same altitude scaling as initialization
+              let scaledAltitude;
+              if (altitudeKm < 2000) {
+                scaledAltitude = altitudeKm * 1000;
+              } else if (altitudeKm < 10000) {
+                scaledAltitude = (2000 + (altitudeKm - 2000) * 0.4) * 1000;
+              } else {
+                scaledAltitude = (5200 + (altitudeKm - 10000) * 0.2) * 1000;
+              }
+              
+              sat.entity.position = Cesium.Cartesian3.fromDegrees(longitude, latitude, scaledAltitude);
+              sat.realAltitudeKm = altitudeKm; // Store for tracking
+            }
+          } catch (error) {
+            // Silently skip propagation errors
+          }
+        });
+        
+        // Camera tracking for selected satellite
+        if (isTracking && trackedSatellite) {
+          const position = trackedSatellite.entity.position.getValue(clock.currentTime);
+          if (position) {
+            const cartographic = Cesium.Cartographic.fromCartesian(position);
+            const scaledAltitude = cartographic.height;
+            
+            viewer.camera.lookAt(
+              position,
+              new Cesium.HeadingPitchRange(
+                0, 
+                -Math.PI / 4,
+                scaledAltitude * 2.5
+              )
+            );
+          }
+        }
+      });
+
+      // Load satellites when page loads
+      loadSatellites();
+
+      // Show satellite labels when zoomed in
+      viewer.scene.camera.changed.addEventListener(function () {
+        const height = Cesium.Cartographic.fromCartesian(
+          viewer.scene.camera.position
+        ).height;
+
+        const showSatLabels = height < 15_000_000;
+        satellites.forEach((sat) => {
+          sat.entity.label.show = showSatLabels;
+        });
+      });
+
+      // --- Click to Track Satellite ---
+      // Handle satellite selection on click
+      viewer.selectedEntityChanged.addEventListener(function (selectedEntity) {
+        if (selectedEntity && selectedEntity.name) {
+          // Hide all orbital paths first
+          satellites.forEach((s) => {
+            if (s.orbitPath) s.orbitPath.polyline.show = false;
+          });
+          
+          // Find the satellite data
+          const sat = satellites.find((s) => s.entity === selectedEntity);
+          if (sat) {
+            trackedSatellite = sat;
+            isTracking = true;
+            console.log(`Now tracking ${selectedEntity.name}`);
+
+            // Show the label and orbital path for tracked satellite
+            sat.entity.label.show = true;
+            if (sat.orbitPath) {
+              sat.orbitPath.polyline.show = true;
+              sat.orbitPath.polyline.material = Cesium.Color.YELLOW; // Bright yellow for testing
+              sat.orbitPath.polyline.width = 8; // Extra thick for visibility
+              console.log(`✓ Showing orbital path for ${selectedEntity.name}`);
+              console.log(`  Path has ${sat.orbitPath.polyline.positions.getValue().length} positions`);
+            } else {
+              console.warn(`⚠ No orbital path found for ${selectedEntity.name}`);
+            }
+
+            // Get current position to calculate proper zoom distance
+            const position = sat.entity.position.getValue(Cesium.JulianDate.now());
+            if (position) {
+              const cartographic = Cesium.Cartographic.fromCartesian(position);
+              const altitude = cartographic.height;
+              
+              // Zoom to satellite
+              viewer.flyTo(selectedEntity, {
+                duration: 2,
+                offset: new Cesium.HeadingPitchRange(
+                  0,
+                  -Math.PI / 4,
+                  altitude * 2.5
+                ),
+              });
+            }
+          }
+        } else if (!selectedEntity) {
+          // Deselect - stop tracking and hide orbit path
+          if (trackedSatellite) {
+            console.log("Stopped tracking");
+            if (trackedSatellite.orbitPath) {
+              trackedSatellite.orbitPath.polyline.show = false;
+            }
+            trackedSatellite = null;
+            isTracking = false;
+          }
+        }
+      });
+
+      // Allow user to stop tracking by pressing ESC
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && isTracking) {
+          viewer.selectedEntity = undefined;
+          if (trackedSatellite && trackedSatellite.orbitPath) {
+            trackedSatellite.orbitPath.polyline.show = false;
+          }
+          isTracking = false;
+          trackedSatellite = null;
+          viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+          console.log('Tracking stopped (ESC pressed)');
+        }
+      });
+    </script>
+  </body>
+</html>
+  </body>
+</html>

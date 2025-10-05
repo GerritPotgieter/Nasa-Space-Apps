@@ -1,0 +1,1457 @@
+import React, { useState } from 'react';
+import { Shield, AlertTriangle, CheckCircle, XCircle, Clock, FileText, Upload, ChevronDown, ChevronUp, Download, Scale, Globe, AlertCircle } from 'lucide-react';
+
+// Sample satellite data with comprehensive compliance information
+const satelliteComplianceData = [
+  {
+    satelliteId: "SAT-001",
+    name: "STARLINK-4582",
+    operator: { country: "USA", company: "SpaceX", incorporationState: "Delaware" },
+    manufacturer: { country: "USA", company: "SpaceX" },
+    launchProvider: { country: "USA", company: "SpaceX" },
+    launchSite: { country: "USA", location: "Cape Canaveral" },
+    registryState: "USA",
+    procuringState: "USA",
+    usesRadioFrequencies: true,
+    crewedMission: false,
+    destination: "LEO",
+    
+    jurisdictionAnalysis: {
+      potentialLaunchingStates: [
+        {/* Non-Applicable Treaties */}
+      {selectedSatellite.nonApplicableTreaties.length > 0 && (
+        <div style={{ marginBottom: '32px' }}>
+          <h2 style={{
+            color: '#9ca3af',
+            fontSize: '16px',
+            fontWeight: '600',
+            marginBottom: '16px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em'
+          }}>
+            Treaties Not Applicable
+          </h2>
+          <div style={{
+            background: '#1a1a1a',
+            border: '1px solid #333',
+            borderRadius: '12px',
+            padding: '20px'
+          }}>
+            {selectedSatellite.nonApplicableTreaties.map(treaty => (
+              <div key={treaty.treatyId} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 0',
+                borderBottom: '1px solid #333'
+              }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: '#6b7280'
+                }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: '#9ca3af', fontSize: '14px', fontWeight: '500' }}>
+                    {treaty.treatyName}
+                  </div>
+                  <div style={{ color: '#6b7280', fontSize: '13px' }}>
+                    {treaty.reason}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Disclaimers */}
+      <div style={{
+        background: 'rgba(239, 68, 68, 0.05)',
+        border: '2px solid rgba(239, 68, 68, 0.3)',
+        borderRadius: '12px',
+        padding: '24px'
+      }}>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+          <AlertTriangle size={24} color="#ef4444" style={{ flexShrink: 0 }} />
+          <div>
+            <h3 style={{ color: '#ef4444', fontSize: '18px', fontWeight: '600', marginBottom: '12px' }}>
+              ⚠️ LIMITATIONS OF THIS TOOL
+            </h3>
+            <div style={{ color: '#fca5a5', fontSize: '14px', lineHeight: '1.8' }}>
+              <div style={{ marginBottom: '12px' }}>
+                <strong>This tool covers INTERNATIONAL TREATIES ONLY.</strong> The following are NOT included:
+              </div>
+              <ul style={{ margin: '0', paddingLeft: '20px' }}>
+                <li>National licensing requirements</li>
+                <li>Export control regulations (ITAR/EAR)</li>
+                <li>National spectrum licensing rules</li>
+                <li>This does NOT constitute legal advice</li>
+              </ul>
+              <div style={{ 
+                marginTop: '16px', 
+                padding: '12px', 
+                background: 'rgba(239, 68, 68, 0.1)',
+                borderRadius: '6px',
+                fontWeight: '600'
+              }}>
+                ⚠️ National authorization is ALWAYS required regardless of treaty compliance status.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ 
+          borderTop: '1px solid rgba(239, 68, 68, 0.3)',
+          paddingTop: '16px',
+          marginTop: '16px',
+          color: '#fca5a5',
+          fontSize: '13px'
+        }}>
+          <div>Data source: UN Office for Outer Space Affairs (UNOOSA)</div>
+          <div>Last system update: March 10, 2024</div>
+          <div>Next scheduled update: April 10, 2024</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderFleetView = () => (
+    <div style={{ padding: '24px' }}>
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{ 
+          color: '#fff', 
+          fontSize: '36px', 
+          fontFamily: "'Playfair Display', serif",
+          marginBottom: '8px' 
+        }}>
+          Fleet Treaty Compliance Dashboard
+        </h1>
+        <p style={{ color: '#9ca3af', fontSize: '16px' }}>
+          Comprehensive compliance overview across your satellite fleet
+        </p>
+      </div>
+
+      {/* Fleet Metrics */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '20px',
+        marginBottom: '32px'
+      }}>
+        <MetricCard
+          icon={<Shield size={24} />}
+          label="Fleet Compliance Score"
+          value="89%"
+          color="#22c55e"
+        />
+        <MetricCard
+          icon={<CheckCircle size={24} />}
+          label="Fully Compliant"
+          value="1/2"
+          color="#22c55e"
+          subtitle="50% of fleet"
+        />
+        <MetricCard
+          icon={<AlertTriangle size={24} />}
+          label="Critical Issues"
+          value="1"
+          color="#ef4444"
+          warning={true}
+        />
+        <MetricCard
+          icon={<Scale size={24} />}
+          label="Treaties Monitored"
+          value="4"
+          color="#3b82f6"
+          subtitle="Per satellite"
+        />
+      </div>
+
+      {/* Compliance by Treaty */}
+      <div style={{
+        background: '#1a1a1a',
+        border: '1px solid #333',
+        borderRadius: '12px',
+        padding: '28px',
+        marginBottom: '32px'
+      }}>
+        <h2 style={{
+          color: '#ff6b35',
+          fontSize: '20px',
+          fontWeight: '600',
+          marginBottom: '24px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em'
+        }}>
+          Compliance by Treaty
+        </h2>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <TreatyProgressBar
+            treatyName="Outer Space Treaty (1967)"
+            percentage={100}
+            satellites="2/2"
+            status="All satellites compliant"
+          />
+          <TreatyProgressBar
+            treatyName="Registration Convention (1975)"
+            percentage={50}
+            satellites="1/2"
+            status="1 satellite missing UN registration"
+            warning={true}
+          />
+          <TreatyProgressBar
+            treatyName="Liability Convention (1972)"
+            percentage={100}
+            satellites="2/2"
+            status="All satellites have state liability coverage"
+          />
+          <TreatyProgressBar
+            treatyName="ITU Radio Regulations"
+            percentage={100}
+            satellites="2/2"
+            status="All frequency licenses valid"
+          />
+        </div>
+      </div>
+
+      {/* Satellite List */}
+      <div style={{ marginBottom: '32px' }}>
+        <h2 style={{
+          color: '#ff6b35',
+          fontSize: '20px',
+          fontWeight: '600',
+          marginBottom: '24px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em'
+        }}>
+          Satellite Compliance Overview
+        </h2>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {satelliteComplianceData.map(sat => (
+            <div
+              key={sat.satelliteId}
+              style={{
+                background: '#1a1a1a',
+                border: `2px solid ${getStatusColor(sat.complianceSummary.overallStatus)}`,
+                borderRadius: '12px',
+                padding: '20px',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onClick={() => {
+                setSelectedSatellite(sat);
+                setViewMode('satellite');
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h3 style={{ color: '#fff', fontSize: '18px', marginBottom: '8px' }}>
+                    {sat.name}
+                  </h3>
+                  <div style={{ color: '#9ca3af', fontSize: '14px' }}>
+                    {sat.satelliteId} • {sat.jurisdictionAnalysis.primaryLaunchingState}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '28px', fontWeight: '700', color: getStatusColor(sat.complianceSummary.overallStatus) }}>
+                    {sat.complianceSummary.overallScore}%
+                  </div>
+                  <div style={{
+                    background: getStatusColor(sat.complianceSummary.overallStatus) + '22',
+                    color: getStatusColor(sat.complianceSummary.overallStatus),
+                    padding: '4px 12px',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    marginTop: '8px'
+                  }}>
+                    {sat.complianceSummary.overallStatus.replace('_', ' ')}
+                  </div>
+                </div>
+              </div>
+              {sat.complianceSummary.criticalViolations > 0 && (
+                <div style={{
+                  marginTop: '16px',
+                  padding: '12px',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <AlertTriangle size={16} color="#ef4444" />
+                  <span style={{ color: '#fca5a5', fontSize: '14px', fontWeight: '600' }}>
+                    {sat.complianceSummary.criticalViolations} critical violation(s) require immediate attention
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#000',
+      color: '#fff',
+      fontFamily: "'Inter', sans-serif"
+    }}>
+      {/* View Mode Switcher */}
+      <div style={{
+        background: '#1a1a1a',
+        borderBottom: '1px solid #333',
+        padding: '16px 24px',
+        display: 'flex',
+        gap: '12px'
+      }}>
+        <button
+          onClick={() => setViewMode('satellite')}
+          style={{
+            background: viewMode === 'satellite' ? '#ff6b35' : 'transparent',
+            color: viewMode === 'satellite' ? '#fff' : '#9ca3af',
+            border: viewMode === 'satellite' ? 'none' : '1px solid #333',
+            padding: '10px 20px',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}
+        >
+          Satellite View
+        </button>
+        <button
+          onClick={() => setViewMode('fleet')}
+          style={{
+            background: viewMode === 'fleet' ? '#ff6b35' : 'transparent',
+            color: viewMode === 'fleet' ? '#fff' : '#9ca3af',
+            border: viewMode === 'fleet' ? 'none' : '1px solid #333',
+            padding: '10px 20px',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}
+        >
+          Fleet Overview
+        </button>
+      </div>
+
+      {viewMode === 'satellite' ? renderSatelliteView() : renderFleetView()}
+    </div>
+  );
+};
+
+const InfoRow = ({ label, value }) => (
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <span style={{ color: '#9ca3af', fontSize: '14px' }}>{label}</span>
+    <span style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>{value}</span>
+  </div>
+);
+
+const MetricCard = ({ icon, label, value, color, warning, subtitle }) => (
+  <div style={{
+    background: '#1a1a1a',
+    border: `1px solid ${warning ? color : '#333'}`,
+    borderRadius: '12px',
+    padding: '24px',
+    position: 'relative',
+    overflow: 'hidden'
+  }}>
+    <div style={{
+      position: 'absolute',
+      top: '0',
+      right: '0',
+      width: '100px',
+      height: '100px',
+      background: `radial-gradient(circle, ${color}22 0%, transparent 70%)`,
+      pointerEvents: 'none'
+    }} />
+    <div style={{ color, marginBottom: '12px' }}>
+      {icon}
+    </div>
+    <div style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '8px' }}>
+      {label}
+    </div>
+    <div style={{ color: '#fff', fontSize: '28px', fontWeight: '700' }}>
+      {value}
+    </div>
+    {subtitle && (
+      <div style={{ color: '#9ca3af', fontSize: '13px', marginTop: '4px' }}>
+        {subtitle}
+      </div>
+    )}
+  </div>
+);
+
+const TreatyProgressBar = ({ treatyName, percentage, satellites, status, warning }) => (
+  <div>
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+      <div style={{ color: '#fff', fontSize: '15px', fontWeight: '500' }}>{treatyName}</div>
+      <div style={{ color: warning ? '#eab308' : '#22c55e', fontSize: '15px', fontWeight: '600' }}>
+        {percentage}% ({satellites})
+      </div>
+    </div>
+    <div style={{
+      width: '100%',
+      height: '8px',
+      background: '#333',
+      borderRadius: '4px',
+      overflow: 'hidden',
+      marginBottom: '6px'
+    }}>
+      <div style={{
+        width: `${percentage}%`,
+        height: '100%',
+        background: warning ? '#eab308' : '#22c55e',
+        transition: 'width 0.3s ease'
+      }} />
+    </div>
+    <div style={{ color: warning ? '#fde047' : '#9ca3af', fontSize: '13px' }}>
+      {status}
+    </div>
+  </div>
+);
+
+const TreatyCard = ({ treaty, expanded, onToggle, expandedObligations, onToggleObligation, userTier }) => {
+  const getStatusColor = (status) => {
+    const colors = {
+      'COMPLIANT': '#22c55e',
+      'NON_COMPLIANT': '#ef4444',
+      'PENDING': '#3b82f6'
+    };
+    return colors[status] || '#6b7280';
+  };
+
+  return (
+    <div style={{
+      background: '#1a1a1a',
+      border: `2px solid ${getStatusColor(treaty.status)}`,
+      borderRadius: '12px',
+      overflow: 'hidden'
+    }}>
+      <div
+        onClick={onToggle}
+        style={{
+          padding: '20px 24px',
+          cursor: 'pointer',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          background: treaty.status === 'NON_COMPLIANT' ? 'rgba(239, 68, 68, 0.05)' : 'transparent'
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <h3 style={{ color: '#fff', fontSize: '18px', margin: 0 }}>
+              {treaty.treatyName}
+            </h3>
+            <div style={{
+              background: getStatusColor(treaty.status) + '22',
+              color: getStatusColor(treaty.status),
+              padding: '4px 12px',
+              borderRadius: '12px',
+              fontSize: '12px',
+              fontWeight: '600'
+            }}>
+              {treaty.status}
+            </div>
+          </div>
+          <div style={{ color: '#9ca3af', fontSize: '14px' }}>
+            {treaty.obligations.length} obligation(s) • Score: {treaty.score}%
+          </div>
+        </div>
+        {expanded ? <ChevronUp size={20} color="#9ca3af" /> : <ChevronDown size={20} color="#9ca3af" />}
+      </div>
+
+      {expanded && (
+        <div style={{ padding: '0 24px 24px 24px', borderTop: '1px solid #333' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '20px' }}>
+            {treaty.obligations.map(obligation => (
+              <ObligationCard
+                key={obligation.obligationId}
+                obligation={obligation}
+                expanded={expandedObligations[obligation.obligationId]}
+                onToggle={() => onToggleObligation(obligation.obligationId)}
+                userTier={userTier}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ObligationCard = ({ obligation, expanded, onToggle, userTier }) => {
+  const getStatusColor = (status) => {
+    const colors = {
+      'COMPLIANT': '#22c55e',
+      'NON_COMPLIANT': '#ef4444',
+      'OVERDUE': '#dc2626',
+      'PENDING': '#3b82f6'
+    };
+    return colors[status] || '#6b7280';
+  };
+
+  const getStatusIcon = (status) => {
+    if (status === 'COMPLIANT') return <CheckCircle size={18} />;
+    if (status === 'NON_COMPLIANT' || status === 'OVERDUE') return <XCircle size={18} />;
+    if (status === 'PENDING') return <Clock size={18} />;
+    return <AlertCircle size={18} />;
+  };
+
+  const getSeverityBadge = (severity) => {
+    const config = {
+      1: { label: 'CRITICAL', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' },
+      2: { label: 'HIGH', color: '#f97316', bg: 'rgba(249, 115, 22, 0.1)' },
+      3: { label: 'MEDIUM', color: '#eab308', bg: 'rgba(234, 179, 8, 0.1)' }
+    };
+    const s = config[severity] || config[3];
+    return (
+      <span style={{
+        background: s.bg,
+        color: s.color,
+        padding: '4px 10px',
+        borderRadius: '12px',
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '0.5px',
+        border: `1px solid ${s.color}44`
+      }}>
+        {s.label}
+      </span>
+    );
+  };
+
+  return (
+    <div style={{
+      background: '#0a0a0a',
+      border: `1px solid ${getStatusColor(obligation.complianceStatus)}44`,
+      borderRadius: '8px',
+      overflow: 'hidden'
+    }}>
+      <div
+        onClick={onToggle}
+        style={{
+          padding: '16px',
+          cursor: 'pointer',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+            <div style={{ color: getStatusColor(obligation.complianceStatus) }}>
+              {getStatusIcon(obligation.complianceStatus)}
+            </div>
+            <span style={{ color: '#fff', fontSize: '15px', fontWeight: '500' }}>
+              {obligation.articleNumber}: {obligation.obligationType.replace(/_/g, ' ')}
+            </span>
+            {getSeverityBadge(obligation.severity)}
+          </div>
+          <div style={{ color: '#9ca3af', fontSize: '13px', marginLeft: '28px' }}>
+            {obligation.obligationText.substring(0, 100)}{obligation.obligationText.length > 100 ? '...' : ''}
+          </div>
+          {obligation.daysOverdue && (
+            <div style={{
+              marginLeft: '28px',
+              marginTop: '8px',
+              color: '#ef4444',
+              fontSize: '13px',
+              fontWeight: '600'
+            }}>
+              ⚠️ OVERDUE by {obligation.daysOverdue} days
+            </div>
+          )}
+        </div>
+        {expanded ? <ChevronUp size={18} color="#9ca3af" /> : <ChevronDown size={18} color="#9ca3af" />}
+      </div>
+
+      {expanded && (
+        <div style={{ padding: '0 16px 16px 16px', borderTop: '1px solid #333' }}>
+          <div style={{ marginTop: '16px' }}>
+            {/* Full Obligation Text */}
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ color: '#ff6b35', fontSize: '13px', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase' }}>
+                Obligation Text
+              </div>
+              <div style={{ 
+                color: '#d1d5db', 
+                fontSize: '14px', 
+                lineHeight: '1.6',
+                padding: '12px',
+                background: '#1a1a1a',
+                borderRadius: '6px',
+                border: '1px solid #333'
+              }}>
+                "{obligation.obligationText}"
+              </div>
+            </div>
+
+            {/* Details Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '12px',
+              marginBottom: '16px'
+            }}>
+              <InfoRow label="Binding On" value={obligation.bindingOn.replace(/_/g, ' ')} />
+              <InfoRow label="Verified" value={obligation.verificationDate || 'Pending'} />
+              {obligation.dueDate && <InfoRow label="Due Date" value={obligation.dueDate} />}
+              {obligation.details?.licenseNumber && (
+                <InfoRow label="License" value={obligation.details.licenseNumber} />
+              )}
+              {obligation.details?.expiryDate && (
+                <InfoRow label="License Expires" value={obligation.details.expiryDate} />
+              )}
+            </div>
+
+            {/* Potential Sanctions */}
+            {obligation.potentialSanctions && obligation.potentialSanctions.length > 0 && (
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ color: '#ff6b35', fontSize: '13px', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase' }}>
+                  ⚖️ Potential Sanctions
+                </div>
+                <ul style={{ 
+                  margin: 0, 
+                  paddingLeft: '20px',
+                  color: '#fca5a5',
+                  fontSize: '13px',
+                  lineHeight: '1.8'
+                }}>
+                  {obligation.potentialSanctions.map((sanction, idx) => (
+                    <li key={idx}>{sanction}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Frequency Details */}
+            {obligation.details?.frequencyBands && (
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ color: '#ff6b35', fontSize: '13px', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase' }}>
+                  Frequency Bands
+                </div>
+                <div style={{ color: '#d1d5db', fontSize: '13px' }}>
+                  {obligation.details.frequencyBands.join(', ')}
+                </div>
+              </div>
+            )}
+
+            {/* Evidence */}
+            {userTier === 'fleet_owner' && obligation.evidence && obligation.evidence.length > 0 && (
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ color: '#ff6b35', fontSize: '13px', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FileText size={14} />
+                  Evidence ({obligation.evidence.length})
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {obligation.evidence.map((evidence, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        background: '#1a1a1a',
+                        border: '1px solid #333',
+                        borderRadius: '6px',
+                        padding: '10px 12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px'
+                      }}
+                    >
+                      <FileText size={16} color="#9ca3af" />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ color: '#fff', fontSize: '13px', fontWeight: '500' }}>
+                          {evidence.description}
+                        </div>
+                        {evidence.licenseNumber && (
+                          <div style={{ color: '#9ca3af', fontSize: '12px' }}>
+                            {evidence.licenseNumber}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Remediation Plan */}
+            {obligation.remediation && (
+              <div style={{
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '8px',
+                padding: '16px'
+              }}>
+                <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600', marginBottom: '12px', textTransform: 'uppercase' }}>
+                  🔧 Remediation Plan
+                </div>
+                <div style={{ color: '#fca5a5', fontSize: '13px', marginBottom: '12px' }}>
+                  <strong>Action:</strong> {obligation.remediation.action}
+                </div>
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+                  gap: '12px',
+                  marginBottom: '12px'
+                }}>
+                  <div>
+                    <div style={{ color: '#f87171', fontSize: '12px', marginBottom: '4px' }}>Assigned To</div>
+                    <div style={{ color: '#fff', fontSize: '13px' }}>{obligation.remediation.assignedTo}</div>
+                  </div>
+                  <div>
+                    <div style={{ color: '#f87171', fontSize: '12px', marginBottom: '4px' }}>Target Date</div>
+                    <div style={{ color: '#fff', fontSize: '13px' }}>{obligation.remediation.targetDate}</div>
+                  </div>
+                  <div>
+                    <div style={{ color: '#f87171', fontSize: '12px', marginBottom: '4px' }}>Priority</div>
+                    <div style={{ color: '#fff', fontSize: '13px' }}>{obligation.remediation.priority}</div>
+                  </div>
+                </div>
+                {obligation.remediation.steps && (
+                  <div>
+                    <div style={{ color: '#f87171', fontSize: '12px', marginBottom: '8px' }}>Steps:</div>
+                    <ol style={{ margin: 0, paddingLeft: '20px', color: '#fca5a5', fontSize: '13px', lineHeight: '1.8' }}>
+                      {obligation.remediation.steps.map((step, idx) => (
+                        <li key={idx}>{step}</li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Actions for Fleet Owner */}
+            {userTier === 'fleet_owner' && (
+              <div style={{ 
+                marginTop: '16px', 
+                paddingTop: '16px', 
+                borderTop: '1px solid #333',
+                display: 'flex',
+                gap: '12px',
+                flexWrap: 'wrap'
+              }}>
+                {obligation.complianceStatus !== 'COMPLIANT' && (
+                  <button style={{
+                    background: '#22c55e',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '10px 16px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: '600'
+                  }}>
+                    Mark as Complete
+                  </button>
+                )}
+                <button style={{
+                  background: 'transparent',
+                  color: '#ff6b35',
+                  border: '1px solid #ff6b35',
+                  padding: '10px 16px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <Upload size={14} />
+                  Upload Evidence
+                </button>
+                {obligation.remediation && (
+                  <button style={{
+                    background: 'transparent',
+                    color: '#9ca3af',
+                    border: '1px solid #333',
+                    padding: '10px 16px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: '600'
+                  }}>
+                    Reassign Task
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ComplianceTracker;
+          state: "USA",
+          basis: ["operator_state", "launch_provider", "launch_territory", "registry_state", "procuring_state"],
+          confidence: "DEFINITIVE"
+        }
+      ],
+      primaryLaunchingState: "USA",
+      ambiguityFlag: false,
+      ambiguityNotes: null,
+      determinationDate: "2024-01-15"
+    },
+    
+    applicableTreaties: [
+      { treatyId: "OST_1967", treatyName: "Outer Space Treaty", ratificationDate: "1967-10-10" },
+      { treatyId: "REG_1975", treatyName: "Registration Convention", ratificationDate: "1976-09-15" },
+      { treatyId: "LIABILITY_1972", treatyName: "Liability Convention", ratificationDate: "1973-09-09" },
+      { treatyId: "ITU_RADIO", treatyName: "ITU Radio Regulations", membershipDate: "1932-01-01" }
+    ],
+    
+    nonApplicableTreaties: [
+      { treatyId: "MOON_1984", treatyName: "Moon Agreement", reason: "USA has not ratified" },
+      { treatyId: "RESCUE_1968", treatyName: "Rescue Agreement", reason: "No crew involved" }
+    ],
+    
+    complianceSummary: {
+      overallStatus: "MOSTLY_COMPLIANT",
+      overallScore: 87,
+      criticalViolations: 1,
+      highPriorityIssues: 0,
+      mediumPriorityIssues: 2,
+      compliantObligations: 15,
+      totalObligations: 18,
+      lastAuditDate: "2024-03-15",
+      nextAuditDue: "2024-09-15"
+    },
+    
+    treatyCompliance: [
+      {
+        treatyId: "OST_1967",
+        treatyName: "Outer Space Treaty",
+        status: "COMPLIANT",
+        score: 100,
+        obligations: [
+          {
+            obligationId: "OST_001",
+            articleNumber: "Article III",
+            obligationType: "GENERAL_PRINCIPLE",
+            obligationText: "Activities in outer space shall be carried out in accordance with international law",
+            bindingOn: "ALL_PARTIES",
+            complianceStatus: "COMPLIANT",
+            severity: 1,
+            potentialSanctions: ["State responsibility under international law", "Potential UN Security Council action"],
+            verificationDate: "2024-03-15",
+            evidence: [{ type: "MISSION_PROFILE", description: "Earth observation for commercial purposes" }]
+          },
+          {
+            obligationId: "OST_002",
+            articleNumber: "Article VI",
+            obligationType: "AUTHORIZATION",
+            obligationText: "States bear international responsibility for national activities in outer space",
+            bindingOn: "LAUNCHING_STATE",
+            complianceStatus: "COMPLIANT",
+            severity: 1,
+            potentialSanctions: ["State liability for damages", "Loss of launch privileges"],
+            verificationDate: "2024-03-15",
+            evidence: [{ type: "LICENSE", description: "FCC authorization FCC-SAT-2024-123", licenseNumber: "FCC-SAT-2024-123" }]
+          },
+          {
+            obligationId: "OST_003",
+            articleNumber: "Article IV",
+            obligationType: "WEAPONS_PROHIBITION",
+            obligationText: "No nuclear weapons or WMD in orbit",
+            bindingOn: "ALL_PARTIES",
+            complianceStatus: "COMPLIANT",
+            severity: 1,
+            potentialSanctions: ["UN Security Council action", "International sanctions"],
+            verificationDate: "2024-03-15",
+            evidence: [{ type: "MISSION_PROFILE", description: "Commercial communications only, no weapons" }]
+          }
+        ]
+      },
+      {
+        treatyId: "REG_1975",
+        treatyName: "Registration Convention",
+        status: "NON_COMPLIANT",
+        score: 50,
+        obligations: [
+          {
+            obligationId: "REG_001",
+            articleNumber: "Article IV",
+            obligationType: "REPORTING",
+            obligationText: "Submit registration information to UN Secretary-General",
+            bindingOn: "REGISTRY_STATE",
+            complianceStatus: "OVERDUE",
+            severity: 1,
+            potentialSanctions: ["Violation of treaty obligations", "Liability complications", "UN censure"],
+            dueDate: "2024-01-30",
+            daysOverdue: 45,
+            remediation: {
+              action: "Submit ST/SG/SER.E registration form to UN OOSA",
+              assignedTo: "Jane Smith, Legal Team",
+              targetDate: "2024-03-31",
+              priority: "CRITICAL",
+              steps: [
+                "Complete ST/SG/SER.E registration form",
+                "Obtain orbital parameters from mission control",
+                "Submit via UNOOSA online portal",
+                "Retain confirmation receipt"
+              ]
+            },
+            evidence: []
+          },
+          {
+            obligationId: "REG_002",
+            articleNumber: "Article II",
+            obligationType: "NATIONAL_REGISTRY",
+            obligationText: "Maintain national registry of space objects",
+            bindingOn: "LAUNCHING_STATE",
+            complianceStatus: "COMPLIANT",
+            severity: 1,
+            potentialSanctions: ["Treaty non-compliance"],
+            verificationDate: "2024-03-15",
+            evidence: [{ type: "LICENSE", description: "FCC database entry confirms national registry" }]
+          }
+        ]
+      },
+      {
+        treatyId: "LIABILITY_1972",
+        treatyName: "Liability Convention",
+        status: "COMPLIANT",
+        score: 100,
+        obligations: [
+          {
+            obligationId: "LIAB_001",
+            articleNumber: "Article II",
+            obligationType: "LIABILITY",
+            obligationText: "Launching State absolutely liable for damage on Earth's surface",
+            bindingOn: "LAUNCHING_STATE",
+            complianceStatus: "COMPLIANT",
+            severity: 1,
+            potentialSanctions: ["Financial liability for damages", "International claims"],
+            verificationDate: "2024-03-15",
+            evidence: [{ type: "STATE_AGREEMENT", description: "USA accepts liability as launching state" }]
+          },
+          {
+            obligationId: "LIAB_002",
+            articleNumber: "Article III",
+            obligationType: "LIABILITY",
+            obligationText: "Fault-based liability for damage in space",
+            bindingOn: "LAUNCHING_STATE",
+            complianceStatus: "COMPLIANT",
+            severity: 2,
+            potentialSanctions: ["Financial liability if at fault"],
+            verificationDate: "2024-03-15",
+            evidence: [{ type: "INSURANCE", description: "Commercial liability insurance in place" }]
+          }
+        ]
+      },
+      {
+        treatyId: "ITU_RADIO",
+        treatyName: "ITU Radio Regulations",
+        status: "COMPLIANT",
+        score: 100,
+        obligations: [
+          {
+            obligationId: "ITU_001",
+            articleNumber: "Article 4",
+            obligationType: "FREQUENCY_COORDINATION",
+            obligationText: "All stations must be authorized and coordinated",
+            bindingOn: "LAUNCHING_STATE",
+            complianceStatus: "COMPLIANT",
+            severity: 2,
+            potentialSanctions: ["Interference claims", "Frequency shutdown", "ITU sanctions"],
+            verificationDate: "2024-03-15",
+            details: {
+              frequencyBands: ["11.7-12.2 GHz (Ku-band)", "14.0-14.5 GHz (Ku-band)"],
+              licenseNumber: "FCC-2024-123",
+              expiryDate: "2029-01-15",
+              ituFiling: "ITU-S-2023-12345"
+            },
+            evidence: [
+              { type: "LICENSE", description: "FCC Spectrum License", licenseNumber: "FCC-2024-123" },
+              { type: "ITU_FILING", description: "ITU Coordination Filing", filingNumber: "ITU-S-2023-12345" }
+            ]
+          },
+          {
+            obligationId: "ITU_002",
+            articleNumber: "Article 15",
+            obligationType: "NO_INTERFERENCE",
+            obligationText: "Avoid harmful interference",
+            bindingOn: "ALL_OPERATORS",
+            complianceStatus: "COMPLIANT",
+            severity: 2,
+            potentialSanctions: ["Interference penalties", "Operational restrictions"],
+            verificationDate: "2024-03-10",
+            details: {
+              interferenceComplaints: 0,
+              monitoringActive: true
+            },
+            evidence: [{ type: "MONITORING_REPORT", description: "No interference complaints filed" }]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    satelliteId: "SAT-002",
+    name: "SENTINEL-3B",
+    operator: { country: "EU", company: "ESA" },
+    manufacturer: { country: "EU", company: "Thales Alenia Space" },
+    launchProvider: { country: "Russia", company: "Roscosmos" },
+    launchSite: { country: "Russia", location: "Plesetsk" },
+    registryState: "EU",
+    procuringState: "EU",
+    usesRadioFrequencies: true,
+    crewedMission: false,
+    destination: "LEO",
+    
+    jurisdictionAnalysis: {
+      potentialLaunchingStates: [
+        {
+          state: "EU",
+          basis: ["operator_state", "registry_state", "procuring_state"],
+          confidence: "DEFINITIVE"
+        },
+        {
+          state: "Russia",
+          basis: ["launch_provider", "launch_territory"],
+          confidence: "POSSIBLE"
+        }
+      ],
+      primaryLaunchingState: "EU",
+      ambiguityFlag: true,
+      ambiguityNotes: "Multiple states could be considered launching states under Liability Convention Article I: EU (registry/operator), Russia (launch provider/territory). EU registered as primary.",
+      determinationDate: "2018-04-25"
+    },
+    
+    applicableTreaties: [
+      { treatyId: "OST_1967", treatyName: "Outer Space Treaty", ratificationDate: "Various (EU members)" },
+      { treatyId: "REG_1975", treatyName: "Registration Convention", ratificationDate: "Various (EU members)" },
+      { treatyId: "LIABILITY_1972", treatyName: "Liability Convention", ratificationDate: "Various (EU members)" },
+      { treatyId: "ITU_RADIO", treatyName: "ITU Radio Regulations", membershipDate: "Various (EU members)" }
+    ],
+    
+    nonApplicableTreaties: [
+      { treatyId: "MOON_1984", treatyName: "Moon Agreement", reason: "Most EU states have not ratified" }
+    ],
+    
+    complianceSummary: {
+      overallStatus: "COMPLIANT",
+      overallScore: 100,
+      criticalViolations: 0,
+      highPriorityIssues: 0,
+      mediumPriorityIssues: 0,
+      compliantObligations: 12,
+      totalObligations: 12,
+      lastAuditDate: "2024-02-20",
+      nextAuditDue: "2024-08-20"
+    },
+    
+    treatyCompliance: [
+      {
+        treatyId: "OST_1967",
+        treatyName: "Outer Space Treaty",
+        status: "COMPLIANT",
+        score: 100,
+        obligations: [
+          {
+            obligationId: "OST_001",
+            articleNumber: "Article III",
+            obligationType: "GENERAL_PRINCIPLE",
+            obligationText: "Activities in outer space shall be carried out in accordance with international law",
+            bindingOn: "ALL_PARTIES",
+            complianceStatus: "COMPLIANT",
+            severity: 1,
+            potentialSanctions: ["State responsibility under international law"],
+            verificationDate: "2024-02-20",
+            evidence: [{ type: "MISSION_PROFILE", description: "Earth observation for environmental monitoring" }]
+          }
+        ]
+      }
+    ]
+  }
+];
+
+const ComplianceTracker = () => {
+  const [selectedSatellite, setSelectedSatellite] = useState(satelliteComplianceData[0]);
+  const [expandedTreaties, setExpandedTreaties] = useState({});
+  const [expandedObligations, setExpandedObligations] = useState({});
+  const [showJurisdictionDetails, setShowJurisdictionDetails] = useState(false);
+  const [userTier, setUserTier] = useState('fleet_owner');
+  const [viewMode, setViewMode] = useState('satellite'); // 'satellite' or 'fleet'
+
+  const toggleTreaty = (treatyId) => {
+    setExpandedTreaties(prev => ({
+      ...prev,
+      [treatyId]: !prev[treatyId]
+    }));
+  };
+
+  const toggleObligation = (obligationId) => {
+    setExpandedObligations(prev => ({
+      ...prev,
+      [obligationId]: !prev[obligationId]
+    }));
+  };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      'COMPLIANT': '#22c55e',
+      'MOSTLY_COMPLIANT': '#eab308',
+      'NON_COMPLIANT': '#ef4444',
+      'PENDING': '#3b82f6',
+      'OVERDUE': '#dc2626',
+      'UNKNOWN': '#6b7280'
+    };
+    return colors[status] || '#6b7280';
+  };
+
+  const getStatusIcon = (status) => {
+    if (status === 'COMPLIANT') return <CheckCircle size={20} />;
+    if (status === 'NON_COMPLIANT' || status === 'OVERDUE') return <XCircle size={20} />;
+    if (status === 'PENDING') return <Clock size={20} />;
+    return <AlertCircle size={20} />;
+  };
+
+  const getSeverityBadge = (severity) => {
+    const config = {
+      1: { label: 'CRITICAL', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' },
+      2: { label: 'HIGH', color: '#f97316', bg: 'rgba(249, 115, 22, 0.1)' },
+      3: { label: 'MEDIUM', color: '#eab308', bg: 'rgba(234, 179, 8, 0.1)' }
+    };
+    const s = config[severity] || config[3];
+    return (
+      <span style={{
+        background: s.bg,
+        color: s.color,
+        padding: '4px 10px',
+        borderRadius: '12px',
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '0.5px',
+        border: `1px solid ${s.color}44`
+      }}>
+        {s.label}
+      </span>
+    );
+  };
+
+  const renderSatelliteView = () => (
+    <div style={{ padding: '24px' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '32px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+          <h1 style={{ 
+            color: '#fff', 
+            fontSize: '36px', 
+            fontFamily: "'Playfair Display', serif",
+            margin: 0
+          }}>
+            {selectedSatellite.name}
+          </h1>
+          <select
+            value={selectedSatellite.satelliteId}
+            onChange={(e) => setSelectedSatellite(satelliteComplianceData.find(s => s.satelliteId === e.target.value))}
+            style={{
+              background: '#1a1a1a',
+              color: '#fff',
+              border: '1px solid #333',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            {satelliteComplianceData.map(sat => (
+              <option key={sat.satelliteId} value={sat.satelliteId}>{sat.name}</option>
+            ))}
+          </select>
+        </div>
+        <p style={{ color: '#9ca3af', fontSize: '16px', margin: 0 }}>
+          Treaty compliance tracking for international space law obligations
+        </p>
+      </div>
+
+      {/* Demo Tier Selector */}
+      <div style={{ 
+        marginBottom: '32px', 
+        padding: '16px', 
+        background: 'rgba(255, 107, 53, 0.1)',
+        borderRadius: '8px',
+        border: '1px solid rgba(255, 107, 53, 0.3)'
+      }}>
+        <label style={{ color: '#9ca3af', fontSize: '14px', marginRight: '12px' }}>
+          Demo Mode - User Tier:
+        </label>
+        <select 
+          value={userTier} 
+          onChange={(e) => setUserTier(e.target.value)}
+          style={{
+            background: '#1a1a1a',
+            color: '#fff',
+            border: '1px solid #333',
+            padding: '8px 16px',
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        >
+          <option value="public">Public</option>
+          <option value="free">Free Account</option>
+          <option value="premium">Premium</option>
+          <option value="fleet_owner">Fleet Owner</option>
+        </select>
+      </div>
+
+      {/* Compliance Overview Card */}
+      <div style={{
+        background: '#1a1a1a',
+        border: `2px solid ${getStatusColor(selectedSatellite.complianceSummary.overallStatus)}`,
+        borderRadius: '12px',
+        padding: '28px',
+        marginBottom: '32px'
+      }}>
+        <h2 style={{
+          color: '#ff6b35',
+          fontSize: '20px',
+          fontWeight: '600',
+          marginBottom: '24px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em'
+        }}>
+          Treaty Compliance Overview
+        </h2>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', marginBottom: '24px' }}>
+          <div>
+            <div style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '8px' }}>Overall Compliance</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ color: '#fff', fontSize: '32px', fontWeight: '700' }}>
+                {selectedSatellite.complianceSummary.overallScore}%
+              </div>
+              <div style={{
+                background: getStatusColor(selectedSatellite.complianceSummary.overallStatus) + '22',
+                color: getStatusColor(selectedSatellite.complianceSummary.overallStatus),
+                padding: '6px 12px',
+                borderRadius: '8px',
+                fontSize: '12px',
+                fontWeight: '600'
+              }}>
+                {selectedSatellite.complianceSummary.overallStatus.replace('_', ' ')}
+              </div>
+            </div>
+            <div style={{
+              width: '100%',
+              height: '8px',
+              background: '#333',
+              borderRadius: '4px',
+              marginTop: '12px',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                width: `${selectedSatellite.complianceSummary.overallScore}%`,
+                height: '100%',
+                background: getStatusColor(selectedSatellite.complianceSummary.overallStatus),
+                transition: 'width 0.3s ease'
+              }} />
+            </div>
+          </div>
+
+          <div>
+            <div style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '8px' }}>Obligations</div>
+            <div style={{ color: '#fff', fontSize: '24px', fontWeight: '600' }}>
+              {selectedSatellite.complianceSummary.compliantObligations}/{selectedSatellite.complianceSummary.totalObligations}
+            </div>
+            <div style={{ color: '#9ca3af', fontSize: '13px', marginTop: '4px' }}>
+              Met requirements
+            </div>
+          </div>
+
+          <div>
+            <div style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '8px' }}>Issues</div>
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+              {selectedSatellite.complianceSummary.criticalViolations > 0 && (
+                <div>
+                  <div style={{ color: '#ef4444', fontSize: '24px', fontWeight: '600' }}>
+                    {selectedSatellite.complianceSummary.criticalViolations}
+                  </div>
+                  <div style={{ color: '#ef4444', fontSize: '11px', textTransform: 'uppercase' }}>Critical</div>
+                </div>
+              )}
+              {selectedSatellite.complianceSummary.highPriorityIssues > 0 && (
+                <div>
+                  <div style={{ color: '#f97316', fontSize: '24px', fontWeight: '600' }}>
+                    {selectedSatellite.complianceSummary.highPriorityIssues}
+                  </div>
+                  <div style={{ color: '#f97316', fontSize: '11px', textTransform: 'uppercase' }}>High</div>
+                </div>
+              )}
+              {selectedSatellite.complianceSummary.mediumPriorityIssues > 0 && (
+                <div>
+                  <div style={{ color: '#eab308', fontSize: '24px', fontWeight: '600' }}>
+                    {selectedSatellite.complianceSummary.mediumPriorityIssues}
+                  </div>
+                  <div style={{ color: '#eab308', fontSize: '11px', textTransform: 'uppercase' }}>Medium</div>
+                </div>
+              )}
+              {selectedSatellite.complianceSummary.criticalViolations === 0 && 
+               selectedSatellite.complianceSummary.highPriorityIssues === 0 &&
+               selectedSatellite.complianceSummary.mediumPriorityIssues === 0 && (
+                <div style={{ color: '#22c55e', fontSize: '18px' }}>
+                  ✓ No issues
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <div style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '8px' }}>Last Audit</div>
+            <div style={{ color: '#fff', fontSize: '16px', fontWeight: '500' }}>
+              {selectedSatellite.complianceSummary.lastAuditDate}
+            </div>
+            <div style={{ color: '#9ca3af', fontSize: '13px', marginTop: '4px' }}>
+              Next: {selectedSatellite.complianceSummary.nextAuditDue}
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={() => alert('PDF report generation would happen here')}
+          style={{
+            background: '#ff6b35',
+            color: '#fff',
+            border: 'none',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          <Download size={16} />
+          Download Full Compliance Report (PDF)
+        </button>
+      </div>
+
+      {/* Jurisdiction Analysis */}
+      <div style={{
+        background: '#1a1a1a',
+        border: '1px solid #333',
+        borderRadius: '12px',
+        padding: '28px',
+        marginBottom: '32px'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+          cursor: 'pointer'
+        }}
+        onClick={() => setShowJurisdictionDetails(!showJurisdictionDetails)}
+        >
+          <h2 style={{
+            color: '#ff6b35',
+            fontSize: '20px',
+            fontWeight: '600',
+            margin: 0,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <Globe size={24} />
+            Jurisdiction Analysis
+          </h2>
+          {showJurisdictionDetails ? <ChevronUp size={20} color="#9ca3af" /> : <ChevronDown size={20} color="#9ca3af" />}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+          <InfoRow label="Primary Launching State" value={selectedSatellite.jurisdictionAnalysis.primaryLaunchingState} />
+          <InfoRow label="Confidence" value={
+            <span style={{
+              color: selectedSatellite.jurisdictionAnalysis.potentialLaunchingStates[0].confidence === 'DEFINITIVE' ? '#22c55e' : '#eab308',
+              fontWeight: '600'
+            }}>
+              {selectedSatellite.jurisdictionAnalysis.potentialLaunchingStates[0].confidence}
+            </span>
+          } />
+          <InfoRow label="Basis" value={selectedSatellite.jurisdictionAnalysis.potentialLaunchingStates[0].basis.length + ' factors'} />
+          <InfoRow label="Determination Date" value={selectedSatellite.jurisdictionAnalysis.determinationDate} />
+        </div>
+
+        {selectedSatellite.jurisdictionAnalysis.ambiguityFlag && (
+          <div style={{
+            background: 'rgba(234, 179, 8, 0.1)',
+            border: '1px solid rgba(234, 179, 8, 0.3)',
+            borderRadius: '8px',
+            padding: '16px',
+            marginTop: '16px',
+            display: 'flex',
+            gap: '12px'
+          }}>
+            <AlertTriangle size={20} color="#eab308" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <div style={{ color: '#eab308', fontWeight: '600', marginBottom: '4px' }}>Jurisdiction Ambiguity</div>
+              <div style={{ color: '#fde047', fontSize: '14px', lineHeight: '1.5' }}>
+                {selectedSatellite.jurisdictionAnalysis.ambiguityNotes}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showJurisdictionDetails && (
+          <div style={{
+            marginTop: '24px',
+            paddingTop: '24px',
+            borderTop: '1px solid #333'
+          }}>
+            <h3 style={{ color: '#fff', fontSize: '16px', marginBottom: '16px' }}>Determination Factors</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <InfoRow label="Operator" value={`${selectedSatellite.operator.company} (${selectedSatellite.operator.country})`} />
+              <InfoRow label="Manufacturer" value={`${selectedSatellite.manufacturer.company} (${selectedSatellite.manufacturer.country})`} />
+              <InfoRow label="Launch Provider" value={`${selectedSatellite.launchProvider.company} (${selectedSatellite.launchProvider.country})`} />
+              <InfoRow label="Launch Site" value={`${selectedSatellite.launchSite.location} (${selectedSatellite.launchSite.country})`} />
+              <InfoRow label="Registry State" value={selectedSatellite.registryState} />
+              <InfoRow label="Procuring State" value={selectedSatellite.procuringState} />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Treaty Compliance */}
+      <div style={{ marginBottom: '32px' }}>
+        <h2 style={{
+          color: '#ff6b35',
+          fontSize: '20px',
+          fontWeight: '600',
+          marginBottom: '24px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em'
+        }}>
+          Treaty Compliance by Treaty
+        </h2>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {selectedSatellite.treatyCompliance.map(treaty => (
+            <TreatyCard
+              key={treaty.treatyId}
+              treaty={treaty}
+              expanded={expandedTreaties[treaty.treatyId]}
+              onToggle={() => toggleTreaty(treaty.treatyId)}
+              expandedObligations={expandedObligations}
+              onToggleObligation={toggleObligation}
+              userTier={userTier}
+            />
+          ))}
+        </div>
+      </div>
+
+      {

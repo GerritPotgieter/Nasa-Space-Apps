@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE ORB - Satellite Tracker</title>
+    <!-- Cesium for 3D Globe -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Cesium.js"></script>
+    <link
+      href="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Widgets/widgets.css"
+      rel="stylesheet"
+    />
+    <!-- Satellite.js for orbital mechanics -->
+    <script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: #000000;
+        color: #ffffff;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      /* Header Styles */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid #333;
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: #ffffff;
+      }
+
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 3rem;
+      }
+
+      .nav-link {
+        color: #cccccc;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: #ff6b35;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b35, #ff8c42);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+
+      .main {
+        padding-top: 70px;
+        min-height: 100vh;
+      }
+
+      /* Tracker Section */
+      .tracker-section {
+        padding: 2rem 0;
+        background: #000000;
+        min-height: calc(100vh - 70px);
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem 0;
+      }
+
+      .section-header h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .section-header p {
+        color: #cccccc;
+        font-size: 1rem;
+      }
+
+      /* Globe Container with Fixed Size */
+      .globe-wrapper {
+        display: flex;
+        gap: 2rem;
+        height: 700px;
+        max-height: calc(100vh - 250px);
+      }
+
+      .globe-controls {
+        flex: 0 0 300px;
+        background: #111111;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 1.5rem;
+        overflow-y: auto;
+        height: 100%;
+      }
+
+      .control-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .control-label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+        color: #ff6b35;
+      }
+
+      .control-input {
+        width: 100%;
+        padding: 0.75rem;
+        background: #000;
+        border: 1px solid #333;
+        border-radius: 6px;
+        color: #fff;
+        font-size: 0.9rem;
+      }
+
+      .control-input:focus {
+        outline: none;
+        border-color: #ff6b35;
+      }
+
+      .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .filter-btn {
+        padding: 0.5rem 1rem;
+        background: #000;
+        border: 1px solid #333;
+        border-radius: 6px;
+        color: #ccc;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .filter-btn.active,
+      .filter-btn:hover {
+        background: #ff6b35;
+        border-color: #ff6b35;
+        color: #000;
+      }
+
+      .cta-primary {
+        background: linear-gradient(135deg, #ff6b35, #ff8c42);
+        color: #000;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        border-radius: 6px;
+        width: 100%;
+        transition: transform 0.3s ease;
+      }
+
+      .cta-primary:hover {
+        transform: translateY(-2px);
+      }
+
+      /* Globe Viewer with Fixed Dimensions */
+      .globe-viewer {
+        flex: 1;
+        background: #000;
+        border: 1px solid #333;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        height: 100%;
+      }
+
+      #globe-canvas {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      /* Cesium overrides to prevent expansion */
+      .cesium-viewer {
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      .cesium-viewer-toolbar,
+      .cesium-viewer-animationContainer,
+      .cesium-viewer-timelineContainer,
+      .cesium-viewer-bottom {
+        display: none !important;
+      }
+
+      .cesium-viewer .cesium-widget-credits {
+        display: none !important;
+      }
+
+      /* Info Panel */
+      .info-panel {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: rgba(0, 0, 0, 0.9);
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 1rem;
+        max-width: 300px;
+        display: none;
+        z-index: 10;
+      }
+
+      .info-panel.active {
+        display: block;
+      }
+
+      .info-panel h3 {
+        color: #ff6b35;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+      }
+
+      .info-panel p {
+        margin: 0.25rem 0;
+        font-size: 0.85rem;
+        color: #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">THE ORB</div>
+        <ul class="nav-menu">
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          <li><a href="tracker.html" class="nav-link active">Tracker</a></li>
+          <li><a href="registry.html" class="nav-link">Registry</a></li>
+          <li><a href="#insurance" class="nav-link">Insurance</a></li>
+          <li><a href="#analytics" class="nav-link">Analytics</a></li>
+        </ul>
+        <div class="user-profile">
+          <div class="user-avatar">SA</div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main">
+      <section class="tracker-section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Global Satellite Tracker</h2>
+            <p>
+              Real-time 3D visualization of satellite positions and orbital
+              trajectories
+            </p>
+          </div>
+
+          <div class="globe-wrapper">
+            <!-- Control Sidebar -->
+            <div class="globe-controls">
+              <div class="control-group">
+                <label class="control-label">Search Satellites</label>
+                <input
+                  type="text"
+                  class="control-input"
+                  placeholder="Enter satellite name or NORAD ID"
+                  id="satelliteSearch"
+                />
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Filter by Type</label>
+                <div class="filter-buttons">
+                  <button class="filter-btn active" data-filter="all">
+                    All
+                  </button>
+                  <button class="filter-btn" data-filter="payload">
+                    Payload
+                  </button>
+                  <button class="filter-btn" data-filter="rocket body">
+                    R/B
+                  </button>
+                  <button class="filter-btn" data-filter="debris">
+                    Debris
+                  </button>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Orbit Type</label>
+                <div class="filter-buttons">
+                  <button class="filter-btn active" data-orbit="all">
+                    All
+                  </button>
+                  <button class="filter-btn" data-orbit="leo">LEO</button>
+                  <button class="filter-btn" data-orbit="meo">MEO</button>
+                  <button class="filter-btn" data-orbit="geo">GEO</button>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Status</label>
+                <div class="filter-buttons">
+                  <button class="filter-btn active" data-status="all">
+                    All
+                  </button>
+                  <button class="filter-btn" data-status="active">
+                    Active
+                  </button>
+                  <button class="filter-btn" data-status="inactive">
+                    Inactive
+                  </button>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <button class="cta-primary" onclick="resetGlobe()">
+                  RESET VIEW
+                </button>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Instructions</label>
+                <p style="font-size: 0.75rem; color: #999; line-height: 1.5">
+                  • Click satellite to track<br />
+                  • Press ESC to stop tracking<br />
+                  • Scroll to zoom<br />
+                  • Drag to rotate view
+                </p>
+              </div>
+            </div>
+
+            <!-- Globe Viewer -->
+            <div class="globe-viewer">
+              <div id="globe-canvas"></div>
+              <div
+                id="loadingIndicator"
+                style="
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  color: #ff6b35;
+                  font-size: 1.2rem;
+                  font-weight: 600;
+                  z-index: 100;
+                "
+              >
+                Loading Globe...
+              </div>
+              <div class="info-panel" id="infoPanel">
+                <h3 id="satName">Satellite Name</h3>
+                <p><strong>NORAD ID:</strong> <span id="satNorad"></span></p>
+                <p><strong>Altitude:</strong> <span id="satAlt"></span> km</p>
+                <p><strong>Velocity:</strong> <span id="satVel"></span> km/s</p>
+                <p><strong>Latitude:</strong> <span id="satLat"></span>°</p>
+                <p><strong>Longitude:</strong> <span id="satLon"></span>°</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      let globeViewer;
+      let satelliteEntities = [];
+      let trackedSatellite = null;
+      let isTracking = false;
+
+      // CSV Parser
+      function parseCSV(csvText) {
+        const lines = csvText.trim().split("\n");
+        const headers = lines[0].split(",");
+        const records = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(",");
+          const record = {};
+          headers.forEach((header, index) => {
+            record[header] = values[index];
+          });
+          records.push(record);
+        }
+
+        return records;
+      }
+
+      // Initialize Cesium Globe
+      function initializeGlobe() {
+        console.log("Initializing Cesium Globe...");
+        const container = document.getElementById("globe-canvas");
+        console.log("Container:", container);
+
+        try {
+          // Create Cesium Viewer (matching working index.html configuration)
+          globeViewer = new Cesium.Viewer(container, {
+            imageryProvider: false,
+            baseLayerPicker: false,
+            geocoder: false,
+            homeButton: false,
+            sceneModePicker: false,
+            navigationHelpButton: false,
+            animation: false,
+            timeline: false,
+            fullscreenButton: false,
+            vrButton: false,
+            infoBox: false,
+            selectionIndicator: false,
+          });
+
+          console.log("Cesium Viewer created successfully");
+          document.getElementById("loadingIndicator").style.display = "none";
+
+          // Dark grey ocean (matching index.html)
+          globeViewer.scene.globe.baseColor =
+            Cesium.Color.fromCssColorString("#2b2b2b");
+
+          // Load country borders
+          Cesium.GeoJsonDataSource.load(
+            "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
+          )
+            .then(function (dataSource) {
+              console.log("Country borders loaded");
+              globeViewer.dataSources.add(dataSource);
+
+              // Style countries with grey fill and white borders
+              const entities = dataSource.entities.values;
+              for (let i = 0; i < entities.length; i++) {
+                const entity = entities[i];
+                if (Cesium.defined(entity.polygon)) {
+                  entity.polygon.material =
+                    Cesium.Color.DARKGRAY.withAlpha(0.5);
+                  entity.polygon.outline = true;
+                  entity.polygon.outlineColor = Cesium.Color.WHITE;
+                  entity.polygon.outlineWidth = 1.0;
+                }
+              }
+            })
+            .catch((error) => {
+              console.error("Error loading country borders:", error);
+            });
+
+          // Set initial camera position
+          globeViewer.camera.setView({
+            destination: Cesium.Cartesian3.fromDegrees(0, 20, 20000000),
+          });
+
+          // Set clock
+          const startTime = Cesium.JulianDate.now();
+          globeViewer.clock.startTime = startTime.clone();
+          globeViewer.clock.currentTime = startTime.clone();
+          globeViewer.clock.clockRange = Cesium.ClockRange.UNBOUNDED;
+          globeViewer.clock.shouldAnimate = true;
+
+          // Load satellites
+          loadSatellitesOnGlobe();
+          startSatelliteUpdates();
+          setupCameraListeners();
+
+          // ESC key handler
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && isTracking) {
+              trackedSatellite = null;
+              isTracking = false;
+              document.getElementById("infoPanel").classList.remove("active");
+            }
+          });
+        } catch (error) {
+          console.error("Error initializing Cesium globe:", error);
+          document.getElementById("loadingIndicator").textContent =
+            "Error loading globe. Please refresh.";
+        }
+      }
+
+      // Load satellites from CSV
+      async function loadSatellitesOnGlobe() {
+        try {
+          const response = await fetch(
+            "../../data/satellites_with_tle_n2yo.csv"
+          );
+          const csvText = await response.text();
+          const satelliteData = parseCSV(csvText);
+
+          console.log(`Loading ${satelliteData.length} satellites...`);
+          let loadedCount = 0;
+
+          satelliteData.forEach((sat) => {
+            if (!sat.TLE_LINE1 || !sat.TLE_LINE2) return;
+
+            try {
+              const satrec = satellite.twoline2satrec(
+                sat.TLE_LINE1,
+                sat.TLE_LINE2
+              );
+              const now = new Date();
+              const positionAndVelocity = satellite.propagate(satrec, now);
+
+              if (positionAndVelocity.position && !positionAndVelocity.error) {
+                const positionEci = positionAndVelocity.position;
+                const gmst = satellite.gstime(now);
+                const positionGd = satellite.eciToGeodetic(positionEci, gmst);
+
+                const longitude = satellite.degreesLong(positionGd.longitude);
+                const latitude = satellite.degreesLat(positionGd.latitude);
+                const altitudeKm = positionGd.height;
+
+                // Scale altitude for better visibility (matching index.html)
+                let scaledAltitude;
+                if (altitudeKm < 2000) {
+                  // LEO: 1:1 scaling
+                  scaledAltitude = altitudeKm * 1000;
+                } else if (altitudeKm < 10000) {
+                  // MEO: compress to 40%
+                  scaledAltitude = (2000 + (altitudeKm - 2000) * 0.4) * 1000;
+                } else {
+                  // GEO/HEO: compress heavily to 20%
+                  scaledAltitude = (5200 + (altitudeKm - 10000) * 0.2) * 1000;
+                }
+
+                const name = sat.OBJECT_NAME || `SAT-${sat.NORAD_CAT_ID}`;
+
+                const entity = globeViewer.entities.add({
+                  name: name,
+                  position: Cesium.Cartesian3.fromDegrees(
+                    longitude,
+                    latitude,
+                    scaledAltitude
+                  ),
+                  box: {
+                    dimensions: new Cesium.Cartesian3(5000, 5000, 5000), // Much smaller for 500 satellites
+                    material: Cesium.Color.ORANGE.withAlpha(0.7),
+                    outline: false, // Remove outline for cleaner look
+                  },
+                  point: {
+                    pixelSize: 3, // Smaller dots
+                    color: Cesium.Color.ORANGE.withAlpha(0.9),
+                    outlineColor: Cesium.Color.WHITE,
+                    outlineWidth: 1,
+                  },
+                  label: {
+                    text: name,
+                    font: "9px sans-serif",
+                    fillColor: Cesium.Color.WHITE,
+                    outlineColor: Cesium.Color.BLACK,
+                    outlineWidth: 2,
+                    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                    pixelOffset: new Cesium.Cartesian2(0, -12),
+                    show: false,
+                    distanceDisplayCondition:
+                      new Cesium.DistanceDisplayCondition(0, 10000000), // Closer distance for labels
+                  },
+                  description: `
+                                    <div style="font-family: sans-serif;">
+                                        <h3>${name}</h3>
+                                        <p><strong>NORAD ID:</strong> ${
+                                          sat.NORAD_CAT_ID
+                                        }</p>
+                                        <p><strong>Altitude:</strong> ${altitudeKm.toFixed(
+                                          2
+                                        )} km</p>
+                                        <p><strong>Inclination:</strong> ${parseFloat(
+                                          sat.INCLINATION || 0
+                                        ).toFixed(2)}°</p>
+                                        <p><strong>Eccentricity:</strong> ${parseFloat(
+                                          sat.ECCENTRICITY || 0
+                                        ).toFixed(6)}</p>
+                                    </div>
+                                `,
+                  properties: {
+                    noradId: sat.NORAD_CAT_ID,
+                    satrec: satrec,
+                    realAltitudeKm: altitudeKm,
+                  },
+                });
+
+                satelliteEntities.push(entity);
+                loadedCount++;
+              }
+            } catch (error) {
+              console.warn(
+                `Failed to load satellite ${sat.NORAD_CAT_ID}:`,
+                error
+              );
+            }
+          });
+
+          console.log(`✓ Loaded ${loadedCount} satellites on globe`);
+        } catch (error) {
+          console.error("Error loading satellites:", error);
+        }
+      }
+
+      // Real-time position updates
+      function startSatelliteUpdates() {
+        globeViewer.clock.onTick.addEventListener(() => {
+          const now = new Date();
+
+          satelliteEntities.forEach((entity) => {
+            try {
+              const satrec = entity.properties.satrec._value;
+              const positionAndVelocity = satellite.propagate(satrec, now);
+
+              if (positionAndVelocity.position && !positionAndVelocity.error) {
+                const positionEci = positionAndVelocity.position;
+                const gmst = satellite.gstime(now);
+                const positionGd = satellite.eciToGeodetic(positionEci, gmst);
+
+                const longitude = satellite.degreesLong(positionGd.longitude);
+                const latitude = satellite.degreesLat(positionGd.latitude);
+                const altitudeKm = positionGd.height;
+
+                // Apply same altitude scaling as initialization
+                let scaledAltitude;
+                if (altitudeKm < 2000) {
+                  scaledAltitude = altitudeKm * 1000;
+                } else if (altitudeKm < 10000) {
+                  scaledAltitude = (2000 + (altitudeKm - 2000) * 0.4) * 1000;
+                } else {
+                  scaledAltitude = (5200 + (altitudeKm - 10000) * 0.2) * 1000;
+                }
+
+                entity.position = Cesium.Cartesian3.fromDegrees(
+                  longitude,
+                  latitude,
+                  scaledAltitude
+                );
+                entity.properties.realAltitudeKm = altitudeKm;
+
+                // Update info panel if tracking
+                if (isTracking && trackedSatellite === entity) {
+                  const velocity = positionAndVelocity.velocity;
+                  const speed = Math.sqrt(
+                    velocity.x * velocity.x +
+                      velocity.y * velocity.y +
+                      velocity.z * velocity.z
+                  );
+
+                  document.getElementById("satName").textContent = entity.name;
+                  document.getElementById("satNorad").textContent =
+                    entity.properties.noradId._value;
+                  document.getElementById("satAlt").textContent =
+                    altitudeKm.toFixed(2);
+                  document.getElementById("satVel").textContent =
+                    speed.toFixed(2);
+                  document.getElementById("satLat").textContent =
+                    latitude.toFixed(4);
+                  document.getElementById("satLon").textContent =
+                    longitude.toFixed(4);
+                  document.getElementById("infoPanel").classList.add("active");
+
+                  // Follow satellite
+                  globeViewer.camera.lookAt(
+                    entity.position._value,
+                    new Cesium.Cartesian3(0, 0, 2000000)
+                  );
+                }
+              }
+            } catch (error) {
+              // Silently skip propagation errors
+            }
+          });
+        });
+
+        // Click handler for tracking
+        globeViewer.selectedEntityChanged.addEventListener((selectedEntity) => {
+          if (selectedEntity && satelliteEntities.includes(selectedEntity)) {
+            trackedSatellite = selectedEntity;
+            isTracking = true;
+          } else {
+            if (!isTracking) {
+              document.getElementById("infoPanel").classList.remove("active");
+            }
+          }
+        });
+      }
+
+      // Reset globe view
+      function resetGlobe() {
+        trackedSatellite = null;
+        isTracking = false;
+        document.getElementById("infoPanel").classList.remove("active");
+        globeViewer.camera.flyTo({
+          destination: Cesium.Cartesian3.fromDegrees(0, 20, 20000000),
+          duration: 2,
+        });
+      }
+
+      // Show satellite labels when zoomed in
+      function setupCameraListeners() {
+        globeViewer.scene.camera.changed.addEventListener(function () {
+          const height = Cesium.Cartographic.fromCartesian(
+            globeViewer.scene.camera.position
+          ).height;
+
+          const showSatLabels = height < 15000000; // Show labels when closer than 15M meters
+          satelliteEntities.forEach((entity) => {
+            if (entity.label) {
+              entity.label.show = showSatLabels;
+            }
+          });
+        });
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeGlobe();
+      });
+    </script>
+  </body>
+</html>

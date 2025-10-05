@@ -1,0 +1,32 @@
+CREATE TABLE IF NOT EXISTS satellites (
+    id SERIAL PRIMARY KEY,
+    object_name VARCHAR(255),
+    object_id VARCHAR(50),
+    epoch TIMESTAMP,
+    mean_motion DOUBLE PRECISION,
+    eccentricity DOUBLE PRECISION,
+    inclination DOUBLE PRECISION,
+    ra_of_asc_node DOUBLE PRECISION,
+    arg_of_pericenter DOUBLE PRECISION,
+    mean_anomaly DOUBLE PRECISION,
+    ephemeris_type VARCHAR(255),
+    classification_type VARCHAR(50),
+    norad_cat_id VARCHAR(50),
+    element_set_no VARCHAR(255),
+    rev_at_epoch TIMESTAMP,
+    bstar DOUBLE PRECISION,
+    mean_motion_dot DOUBLE PRECISION,
+    mean_motion_ddot DOUBLE PRECISION,
+    tle_line1 TEXT,
+    tle_line2 TEXT,
+    tle_epoch TIMESTAMP,
+    tle_mean_motion DOUBLE PRECISION,
+    tle_eccentricity DOUBLE PRECISION,
+    tle_inclination DOUBLE PRECISION,
+    tle_ra_of_asc_node DOUBLE PRECISION,
+    tle_arg_of_pericenter DOUBLE PRECISION,
+    tle_mean_anomaly DOUBLE PRECISION,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_satellites_norad ON satellites(norad_cat_id);

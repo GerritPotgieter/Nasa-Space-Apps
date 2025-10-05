@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE ORB - Advanced Satellite Tracker</title>
+    <!-- Cesium for 3D Globe -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Cesium.js"></script>
+    <link
+      href="https://cesium.com/downloads/cesiumjs/releases/1.118/Build/Cesium/Widgets/widgets.css"
+      rel="stylesheet"
+    />
+    <!-- Satellite.js for orbital mechanics -->
+    <script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: #121212;
+        color: #eaeaea;
+        overflow: hidden;
+      }
+
+      /* Fullscreen Globe Container */
+      #cesiumContainer {
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      /* Header Styles */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(18, 18, 18, 0.95);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(234, 234, 234, 0.15);
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: #eaeaea;
+      }
+
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 3rem;
+      }
+
+      .nav-link {
+        color: #eaeaea;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: #e85d04;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b35, #ff8c42);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+
+      /* Loading Indicator */
+      #loadingIndicator {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        padding: 2rem 3rem;
+        border-radius: 10px;
+        z-index: 2000;
+        text-align: center;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 1rem;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-top: 4px solid #ff6b35;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Info Panel - Minimalist */
+      .info-panel {
+        position: fixed;
+        bottom: 2rem;
+        left: 2rem;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 1000;
+        font-size: 0.85rem;
+        min-width: 250px;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 0.3rem 0;
+        padding: 0.3rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .info-row:last-child {
+        border-bottom: none;
+      }
+
+      .info-label {
+        color: #888;
+        font-weight: 500;
+      }
+
+      .info-value {
+        color: #fff;
+        font-weight: 600;
+      }
+
+      /* Satellite Info Card - Appears on Click */
+      .satellite-card {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.9);
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 2rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        z-index: 2000;
+        max-width: 400px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s ease;
+      }
+
+      .satellite-card.active {
+        opacity: 1;
+        pointer-events: all;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      .satellite-card h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #ff6b35;
+      }
+
+      .satellite-card .detail {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .satellite-card .detail:last-child {
+        border-bottom: none;
+      }
+
+      .satellite-card .close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: background 0.3s ease;
+      }
+
+      .satellite-card .close-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Controls Panel */
+      .controls {
+        position: fixed;
+        top: 5rem;
+        right: 2rem;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 1000;
+        max-height: calc(100vh - 6rem);
+        overflow-y: auto;
+        width: 300px;
+      }
+
+      .control-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .control-group:last-child {
+        margin-bottom: 0;
+      }
+
+      .control-label {
+        display: block;
+        font-size: 0.75rem;
+        color: #888;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .control-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        padding: 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+      }
+
+      .control-input:focus {
+        outline: none;
+        border-color: #ff6b35;
+      }
+
+      .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .filter-btn {
+        padding: 0.4rem 0.8rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ccc;
+        font-size: 0.75rem;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+      }
+
+      .filter-btn.active,
+      .filter-btn:hover {
+        background: #ff6b35;
+        border-color: #ff6b35;
+        color: #000;
+        font-weight: 600;
+      }
+
+      .control-button {
+        width: 100%;
+        background: #ff6b35;
+        border: none;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+        margin-top: 0.5rem;
+      }
+
+      .control-button:hover {
+        background: #ff8c42;
+      }
+
+      /* Stats Badge */
+      .stats-badge {
+        position: fixed;
+        top: 5rem;
+        left: 2rem;
+        background: rgba(255, 107, 53, 0.2);
+        border: 1px solid rgba(255, 107, 53, 0.5);
+        padding: 0.75rem 1.5rem;
+        border-radius: 20px;
+        font-weight: 600;
+        z-index: 1000;
+        color: #ff6b35;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <a href="dashboard.html" class="logo">THE ORB</a>
+        <ul class="nav-menu">
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          <li><a href="tracker_v2.html" class="nav-link active">Tracker</a></li>
+          <li><a href="registry.html" class="nav-link">Registry</a></li>
+          <li><a href="insurance_new.html" class="nav-link">Insurance</a></li>
+          <li><a href="compliance.html" class="nav-link">Compliance</a></li>
+        </ul>
+        <div class="user-profile">
+          <div class="user-avatar">SA</div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Stats Badge -->
+    <div class="stats-badge" id="statsBadge">Loading satellites...</div>
+
+    <!-- Controls Panel -->
+    <div class="controls">
+      <div class="control-group">
+        <label class="control-label">Search Satellites</label>
+        <input
+          type="text"
+          class="control-input"
+          id="satelliteSearch"
+          placeholder="Name or NORAD ID..."
+        />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Filter by Type</label>
+        <div class="filter-buttons">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="payload">Payload</button>
+          <button class="filter-btn" data-filter="rocket">R/B</button>
+          <button class="filter-btn" data-filter="debris">Debris</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Orbit Type</label>
+        <div class="filter-buttons">
+          <button class="filter-btn active" data-orbit="all">All</button>
+          <button class="filter-btn" data-orbit="leo">LEO</button>
+          <button class="filter-btn" data-orbit="meo">MEO</button>
+          <button class="filter-btn" data-orbit="geo">GEO</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Status</label>
+        <div class="filter-buttons">
+          <button class="filter-btn active" data-status="all">All</button>
+          <button class="filter-btn" data-status="active">Active</button>
+          <button class="filter-btn" data-status="inactive">Inactive</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Point Size</label>
+        <input
+          type="range"
+          class="control-input"
+          id="pointSize"
+          min="1"
+          max="10"
+          value="2"
+          step="0.5"
+        />
+      </div>
+      <div class="control-group">
+        <label class="control-label">Satellite Opacity</label>
+        <input
+          type="range"
+          class="control-input"
+          id="satOpacity"
+          min="0.1"
+          max="1"
+          value="0.9"
+          step="0.1"
+        />
+      </div>
+      <div class="control-group">
+        <button class="control-button" id="resetCamera">Reset View</button>
+        <button class="control-button" onclick="clearFilters()">
+          Clear Filters
+        </button>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" style="color: #666; font-size: 0.7rem"
+          >Instructions</label
+        >
+        <p style="font-size: 0.7rem; color: #666; line-height: 1.5; margin: 0">
+          • Click satellite to track<br />
+          • Press ESC to stop tracking<br />
+          • Scroll to zoom<br />
+          • Drag to rotate view
+        </p>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator">
+      <div class="spinner"></div>
+      <div>Loading satellite data...</div>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="info-panel">
+      <div class="info-row">
+        <span class="info-label">Satellites Tracked:</span>
+        <span class="info-value" id="satCount">0</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Update Rate:</span>
+        <span class="info-value">60 FPS</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">View Mode:</span>
+        <span class="info-value">Real-time</span>
+      </div>
+    </div>
+
+    <!-- Satellite Detail Card -->
+    <div class="satellite-card" id="satelliteCard">
+      <button class="close-btn" onclick="closeSatelliteCard()">×</button>
+      <h2 id="satName">Satellite Name</h2>
+      <div class="detail">
+        <span>NORAD ID:</span>
+        <span id="satNorad">-</span>
+      </div>
+      <div class="detail">
+        <span>Altitude:</span>
+        <span id="satAlt">- km</span>
+      </div>
+      <div class="detail">
+        <span>Velocity:</span>
+        <span id="satVel">- km/s</span>
+      </div>
+      <div class="detail">
+        <span>Inclination:</span>
+        <span id="satInc">-°</span>
+      </div>
+      <div class="detail">
+        <span>Eccentricity:</span>
+        <span id="satEcc">-</span>
+      </div>
+      <div class="detail">
+        <span>Period:</span>
+        <span id="satPeriod">- min</span>
+      </div>
+    </div>
+
+    <!-- Cesium Container -->
+    <div id="cesiumContainer"></div>
+
+    <script>
+      let viewer;
+      let satelliteEntities = [];
+      let allSatelliteData = []; // Store all data for filtering
+      let selectedSatellite = null;
+      let currentFilters = {
+        search: "",
+        type: "all",
+        orbit: "all",
+        status: "all",
+      };
+
+      // CSV Parser
+      function parseCSV(csvText) {
+        const lines = csvText.trim().split("\n");
+        const headers = lines[0].split(",").map((h) => h.trim());
+        const records = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(",");
+          const record = {};
+          headers.forEach((header, index) => {
+            record[header] = values[index] ? values[index].trim() : "";
+          });
+          records.push(record);
+        }
+
+        return records;
+      }
+
+      // Determine orbit type from altitude
+      function getOrbitType(altitudeKm) {
+        if (altitudeKm < 2000) return "leo";
+        if (altitudeKm < 35000) return "meo";
+        return "geo";
+      }
+
+      // Determine satellite type from name/type field
+      function getSatelliteType(sat) {
+        const name = (sat.OBJECT_NAME || sat.Name || "").toUpperCase();
+        const type = (sat.Type || sat.OBJECT_TYPE || "").toUpperCase();
+
+        if (
+          type.includes("R/B") ||
+          type.includes("ROCKET") ||
+          name.includes("R/B")
+        ) {
+          return "rocket";
+        }
+        if (type.includes("DEB") || name.includes("DEB")) {
+          return "debris";
+        }
+        return "payload";
+      }
+
+      // Check if satellite matches current filters
+      function matchesFilters(sat, altitudeKm) {
+        // Search filter
+        if (currentFilters.search) {
+          const search = currentFilters.search.toLowerCase();
+          const name = (
+            sat.OBJECT_NAME ||
+            sat.N2YO_SAT_NAME ||
+            ""
+          ).toLowerCase();
+          const norad = (sat.NORAD_CAT_ID || sat.JCAT || "").toString();
+          if (!name.includes(search) && !norad.includes(search)) {
+            return false;
+          }
+        }
+
+        // Orbit type filter
+        if (currentFilters.orbit !== "all") {
+          const orbitType = getOrbitType(altitudeKm);
+          if (orbitType !== currentFilters.orbit) {
+            return false;
+          }
+        }
+
+        // Type filter
+        if (currentFilters.type !== "all") {
+          const satType = getSatelliteType(sat);
+          if (satType !== currentFilters.type) {
+            return false;
+          }
+        }
+
+        // Status filter
+        if (currentFilters.status !== "all") {
+          const status = (sat.STATUS || sat.Status || "").toLowerCase();
+          if (currentFilters.status === "active" && status !== "active") {
+            return false;
+          }
+          if (currentFilters.status === "inactive" && status !== "inactive") {
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      // Apply filters to visible satellites
+      function applyFilters() {
+        let visibleCount = 0;
+
+        satelliteEntities.forEach((entity) => {
+          const sat = entity.properties.satData._value;
+          const altKm = entity.properties.realAltitudeKm._value;
+          const matches = matchesFilters(sat, altKm);
+
+          entity.show = matches;
+          if (matches) visibleCount++;
+        });
+
+        document.getElementById("satCount").textContent = visibleCount;
+        document.getElementById(
+          "statsBadge"
+        ).textContent = `${visibleCount} / ${satelliteEntities.length} Satellites`;
+      }
+
+      // Clear all filters
+      function clearFilters() {
+        currentFilters = {
+          search: "",
+          type: "all",
+          orbit: "all",
+          status: "all",
+        };
+
+        document.getElementById("satelliteSearch").value = "";
+        document.querySelectorAll(".filter-btn").forEach((btn) => {
+          btn.classList.remove("active");
+          if (
+            btn.dataset.filter === "all" ||
+            btn.dataset.orbit === "all" ||
+            btn.dataset.status === "all"
+          ) {
+            btn.classList.add("active");
+          }
+        });
+
+        applyFilters();
+      }
+
+      // Initialize Cesium Globe with satellitemap.space inspired settings
+      function initializeGlobe() {
+        viewer = new Cesium.Viewer("cesiumContainer", {
+          imageryProvider: false,
+          baseLayerPicker: false,
+          geocoder: false,
+          homeButton: false,
+          sceneModePicker: false,
+          navigationHelpButton: false,
+          animation: false,
+          timeline: false,
+          fullscreenButton: false,
+          vrButton: false,
+          infoBox: false,
+          selectionIndicator: false,
+        });
+
+        // Very dark base for space-like appearance
+        viewer.scene.globe.baseColor =
+          Cesium.Color.fromCssColorString("#0a0a0a");
+
+        // Enable lighting for realistic shadows
+        viewer.scene.globe.enableLighting = true;
+
+        // Load simplified country borders
+        Cesium.GeoJsonDataSource.load(
+          "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
+        ).then(function (dataSource) {
+          viewer.dataSources.add(dataSource);
+
+          // Very subtle country outlines
+          const entities = dataSource.entities.values;
+          for (let i = 0; i < entities.length; i++) {
+            const entity = entities[i];
+            if (Cesium.defined(entity.polygon)) {
+              entity.polygon.material =
+                Cesium.Color.fromCssColorString("#1a1a1a").withAlpha(0.3);
+              entity.polygon.outline = true;
+              entity.polygon.outlineColor =
+                Cesium.Color.fromCssColorString("#2a2a2a");
+              entity.polygon.outlineWidth = 0.5;
+            }
+          }
+        });
+
+        // Set initial camera - Look directly at Earth from space
+        viewer.camera.setView({
+          destination: Cesium.Cartesian3.fromDegrees(0, 20, 20000000), // Centered view of Earth
+          orientation: {
+            heading: 0.0,
+            pitch: Cesium.Math.toRadians(-90), // Look straight down at globe
+            roll: 0.0,
+          },
+        });
+
+        // Smooth camera movements
+        viewer.scene.screenSpaceCameraController.inertiaZoom = 0.5;
+        viewer.scene.screenSpaceCameraController.inertiaSpin = 0.5;
+
+        // Clock setup
+        viewer.clock.startTime = Cesium.JulianDate.now();
+        viewer.clock.currentTime = Cesium.JulianDate.now();
+        viewer.clock.shouldAnimate = true;
+
+        loadSatellites();
+        setupControls();
+      }
+
+      // Load satellites with minimal, clean design
+      async function loadSatellites() {
+        try {
+          const response = await fetch(
+            "../../data/satellites_with_tle_n2yo.csv"
+          );
+          const csvText = await response.text();
+          const satelliteData = parseCSV(csvText);
+
+          console.log(`Loading ${satelliteData.length} satellites...`);
+          let loadedCount = 0;
+
+          satelliteData.forEach((sat) => {
+            if (!sat.TLE_LINE1 || !sat.TLE_LINE2) return;
+
+            try {
+              const satrec = satellite.twoline2satrec(
+                sat.TLE_LINE1,
+                sat.TLE_LINE2
+              );
+              const now = new Date();
+              const positionAndVelocity = satellite.propagate(satrec, now);
+
+              if (positionAndVelocity.position && !positionAndVelocity.error) {
+                const positionEci = positionAndVelocity.position;
+                const gmst = satellite.gstime(now);
+                const positionGd = satellite.eciToGeodetic(positionEci, gmst);
+
+                const longitude = satellite.degreesLong(positionGd.longitude);
+                const latitude = satellite.degreesLat(positionGd.latitude);
+                const altitudeKm = positionGd.height;
+
+                const name =
+                  sat.OBJECT_NAME ||
+                  sat.N2YO_SAT_NAME ||
+                  `SAT-${sat.NORAD_CAT_ID || sat.JCAT}`;
+
+                // FLAT PLANE: All satellites at fixed altitude for clean visualization
+                const fixedAltitude = 500000; // 500km above surface (single plane)
+
+                // MINIMAL DESIGN: Only point primitives, no boxes
+                const entity = viewer.entities.add({
+                  name: name,
+                  position: Cesium.Cartesian3.fromDegrees(
+                    longitude,
+                    latitude,
+                    fixedAltitude // Single plane altitude
+                  ),
+                  point: {
+                    pixelSize: 2, // Very small dots like satellitemap.space
+                    color: Cesium.Color.fromCssColorString("#ff6b35"),
+                    outlineColor: Cesium.Color.WHITE.withAlpha(0.3),
+                    outlineWidth: 0,
+                  },
+                  properties: {
+                    noradId: sat.NORAD_CAT_ID || sat.JCAT,
+                    satrec: satrec,
+                    realAltitudeKm: altitudeKm,
+                    inclination: sat.INCLINATION,
+                    eccentricity: sat.ECCENTRICITY,
+                    satData: sat, // Store full satellite data for filtering
+                  },
+                });
+
+                satelliteEntities.push(entity);
+                loadedCount++;
+              }
+            } catch (error) {
+              console.warn(`Failed to load satellite:`, error);
+            }
+          });
+
+          allSatelliteData = satelliteData;
+          console.log(`✓ Loaded ${loadedCount} satellites`);
+          document.getElementById("satCount").textContent = loadedCount;
+          document.getElementById(
+            "statsBadge"
+          ).textContent = `${loadedCount} Satellites Tracked`;
+          document.getElementById("loadingIndicator").style.display = "none";
+
+          startRealTimeUpdates();
+          setupControls();
+        } catch (error) {
+          console.error("Error loading satellites:", error);
+          document.getElementById("loadingIndicator").innerHTML =
+            '<div style="color: #ff6b35;">Error loading satellite data</div>';
+        }
+      }
+
+      // Real-time satellite position updates using SGP4
+      function startRealTimeUpdates() {
+        viewer.clock.onTick.addEventListener(() => {
+          const now = new Date();
+
+          satelliteEntities.forEach((entity) => {
+            if (!entity.show) return; // Skip hidden satellites
+
+            try {
+              const satrec = entity.properties.satrec._value;
+
+              // Propagate satellite position using SGP4
+              const positionAndVelocity = satellite.propagate(satrec, now);
+
+              if (positionAndVelocity.position && !positionAndVelocity.error) {
+                const positionEci = positionAndVelocity.position;
+                const gmst = satellite.gstime(now);
+                const positionGd = satellite.eciToGeodetic(positionEci, gmst);
+
+                // Convert to degrees
+                const longitude = satellite.degreesLong(positionGd.longitude);
+                const latitude = satellite.degreesLat(positionGd.latitude);
+                const altitudeKm = positionGd.height;
+
+                // Fixed plane altitude for clean visualization
+                const fixedAltitude = 500000; // 500km above surface
+
+                // Update entity position
+                entity.position = Cesium.Cartesian3.fromDegrees(
+                  longitude,
+                  latitude,
+                  fixedAltitude
+                );
+
+                // Store real altitude for info display
+                entity.properties.realAltitudeKm = altitudeKm;
+              }
+            } catch (error) {
+              // Silently skip propagation errors
+              console.warn(
+                "Propagation error for satellite:",
+                entity.name,
+                error
+              );
+            }
+          });
+        });
+      }
+
+      // Setup interactive controls
+      function setupControls() {
+        // Search input
+        document
+          .getElementById("satelliteSearch")
+          .addEventListener("input", (e) => {
+            currentFilters.search = e.target.value;
+            applyFilters();
+          });
+
+        // Type filter buttons
+        document.querySelectorAll("[data-filter]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            document
+              .querySelectorAll("[data-filter]")
+              .forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentFilters.type = btn.dataset.filter;
+            applyFilters();
+          });
+        });
+
+        // Orbit filter buttons
+        document.querySelectorAll("[data-orbit]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            document
+              .querySelectorAll("[data-orbit]")
+              .forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentFilters.orbit = btn.dataset.orbit;
+            applyFilters();
+          });
+        });
+
+        // Status filter buttons
+        document.querySelectorAll("[data-status]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            document
+              .querySelectorAll("[data-status]")
+              .forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentFilters.status = btn.dataset.status;
+            applyFilters();
+          });
+        });
+
+        // Point size control
+        document.getElementById("pointSize").addEventListener("input", (e) => {
+          const size = parseFloat(e.target.value);
+          satelliteEntities.forEach((entity) => {
+            entity.point.pixelSize = size;
+          });
+        });
+
+        // Opacity control
+        document.getElementById("satOpacity").addEventListener("input", (e) => {
+          const opacity = parseFloat(e.target.value);
+          satelliteEntities.forEach((entity) => {
+            entity.point.color =
+              Cesium.Color.fromCssColorString("#ff6b35").withAlpha(opacity);
+          });
+        });
+
+        // Reset camera - matches initial view
+        document.getElementById("resetCamera").addEventListener("click", () => {
+          viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(0, 20, 20000000),
+            orientation: {
+              heading: 0.0,
+              pitch: Cesium.Math.toRadians(-90), // Look straight down
+              roll: 0.0,
+            },
+            duration: 2,
+          });
+          closeSatelliteCard();
+        });
+
+        // Click handler for satellite selection
+        const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+        handler.setInputAction((click) => {
+          const pickedObject = viewer.scene.pick(click.position);
+          if (Cesium.defined(pickedObject) && pickedObject.id) {
+            showSatelliteDetails(pickedObject.id);
+          }
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+      }
+
+      // Show satellite details in card
+      function showSatelliteDetails(entity) {
+        selectedSatellite = entity;
+
+        const props = entity.properties;
+        const name = entity.name;
+        const noradId = props.noradId?._value || "-";
+        const altKm = props.realAltitudeKm?._value || 0;
+        const inc = props.inclination?._value || "-";
+        const ecc = props.eccentricity?._value || "-";
+
+        // Calculate velocity (approximate)
+        const velocity = Math.sqrt(398600.4418 / altKm).toFixed(2);
+
+        // Calculate orbital period
+        const period = (
+          (2 * Math.PI * Math.sqrt(Math.pow(altKm + 6371, 3) / 398600.4418)) /
+          60
+        ).toFixed(1);
+
+        document.getElementById("satName").textContent = name;
+        document.getElementById("satNorad").textContent = noradId;
+        document.getElementById("satAlt").textContent = `${altKm.toFixed(
+          2
+        )} km`;
+        document.getElementById("satVel").textContent = `${velocity} km/s`;
+        document.getElementById("satInc").textContent = `${parseFloat(
+          inc
+        ).toFixed(2)}°`;
+        document.getElementById("satEcc").textContent =
+          parseFloat(ecc).toFixed(6);
+        document.getElementById("satPeriod").textContent = `${period} min`;
+
+        document.getElementById("satelliteCard").classList.add("active");
+
+        // Track satellite
+        viewer.trackedEntity = entity;
+      }
+
+      // Close satellite detail card
+      function closeSatelliteCard() {
+        document.getElementById("satelliteCard").classList.remove("active");
+        viewer.trackedEntity = undefined;
+        selectedSatellite = null;
+      }
+
+      // ESC key to close card
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeSatelliteCard();
+        }
+      });
+
+      // Initialize on page load
+      window.addEventListener("DOMContentLoaded", initializeGlobe);
+    </script>
+  </body>
+</html>

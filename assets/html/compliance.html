@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE ORB - Big Five Compliance Tracker</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: #121212;
+        color: #eaeaea;
+        min-height: 100vh;
+        padding-top: 170px;
+      }
+
+      /* Header Styles */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1003;
+        background: rgba(18, 18, 18, 0.95);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(234, 234, 234, 0.15);
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: #eaeaea;
+        text-decoration: none;
+      }
+
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 3rem;
+      }
+
+      .nav-link {
+        color: #eaeaea;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: #e85d04;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #e85d04, #f77f00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      .top-banner {
+        background: linear-gradient(135deg, #e85d04 0%, #f77f00 100%);
+        padding: 12px 24px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 14px;
+        color: #121212;
+        border-bottom: 2px solid #e85d04;
+        position: fixed;
+        top: 68px;
+        left: 0;
+        right: 0;
+        z-index: 1002;
+      }
+      .view-switcher {
+        background: rgba(18, 18, 18, 0.95);
+        border-bottom: 1px solid rgba(234, 234, 234, 0.15);
+        padding: 16px 24px;
+        display: flex;
+        gap: 12px;
+        position: fixed;
+        top: 110px;
+        left: 0;
+        right: 0;
+        z-index: 1001;
+        backdrop-filter: blur(20px);
+      }
+      .view-btn {
+        background: transparent;
+        color: #eaeaea;
+        opacity: 0.7;
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      .view-btn.active {
+        background: #e85d04;
+        color: #121212;
+        opacity: 1;
+        border: none;
+      }
+      .content {
+        padding: 24px;
+      }
+      .page-header {
+        margin-bottom: 32px;
+      }
+      .page-header h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 36px;
+        color: #eaeaea;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .big-five-badge {
+        background: linear-gradient(135deg, #e85d04 0%, #f77f00 100%);
+        color: #121212;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+      .header p {
+        color: #eaeaea;
+        opacity: 0.8;
+        font-size: 16px;
+      }
+      .demo-selector {
+        margin-bottom: 32px;
+        padding: 16px;
+        background: rgba(232, 93, 4, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(232, 93, 4, 0.3);
+      }
+      .demo-selector label {
+        color: #eaeaea;
+        opacity: 0.8;
+        font-size: 14px;
+        margin-right: 12px;
+      }
+      .demo-selector select {
+        background: rgba(18, 18, 18, 0.7);
+        color: #eaeaea;
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .compliance-overview {
+        background: rgba(18, 18, 18, 0.5);
+        border: 2px solid #22c55e;
+        border-radius: 12px;
+        padding: 28px;
+        margin-bottom: 32px;
+        backdrop-filter: blur(10px);
+      }
+      .compliance-overview.mostly-compliant {
+        border-color: #eab308;
+      }
+      .compliance-overview.non-compliant {
+        border-color: #ef4444;
+      }
+      .section-title {
+        color: #e85d04;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+      .metric {
+        color: #eaeaea;
+        opacity: 0.7;
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+      .metric-value {
+        color: #eaeaea;
+        font-size: 32px;
+        font-weight: 700;
+      }
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(234, 234, 234, 0.15);
+        border-radius: 4px;
+        margin-top: 12px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: #22c55e;
+        transition: width 0.3s ease;
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: 12px;
+      }
+      .jurisdiction-card {
+        background: rgba(18, 18, 18, 0.5);
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        border-radius: 12px;
+        padding: 28px;
+        margin-bottom: 32px;
+        backdrop-filter: blur(10px);
+      }
+      .jurisdiction-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        margin-bottom: 20px;
+      }
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+      }
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+      }
+      .info-label {
+        color: #eaeaea;
+        opacity: 0.7;
+        font-size: 14px;
+      }
+      .info-value {
+        color: #eaeaea;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .treaty-card {
+        background: rgba(18, 18, 18, 0.5);
+        border: 2px solid #22c55e;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+      .treaty-card.non-compliant {
+        border-color: #ef4444;
+      }
+      .treaty-header {
+        padding: 20px 24px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.3s ease;
+      }
+      .treaty-header:hover {
+        background: rgba(232, 93, 4, 0.05);
+      }
+      .treaty-card.non-compliant .treaty-header {
+        background: rgba(239, 68, 68, 0.05);
+      }
+      .treaty-title {
+        font-size: 18px;
+        color: #eaeaea;
+        margin-bottom: 8px;
+      }
+      .treaty-meta {
+        color: #eaeaea;
+        opacity: 0.7;
+        font-size: 14px;
+      }
+      .treaty-content {
+        padding: 0 24px 24px 24px;
+        border-top: 1px solid rgba(234, 234, 234, 0.15);
+        display: none;
+      }
+      .treaty-content.expanded {
+        display: block;
+      }
+      .obligation-card {
+        background: rgba(10, 10, 10, 0.5);
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        border-radius: 8px;
+        margin-top: 20px;
+        overflow: hidden;
+      }
+      .obligation-header {
+        padding: 16px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .obligation-title-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+      }
+      .obligation-title {
+        color: #eaeaea;
+        font-size: 15px;
+        font-weight: 500;
+      }
+      .severity-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+      .severity-critical {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+      .severity-high {
+        background: rgba(249, 115, 22, 0.1);
+        color: #f97316;
+        border: 1px solid rgba(249, 115, 22, 0.3);
+      }
+      .severity-medium {
+        background: rgba(234, 179, 8, 0.1);
+        color: #eab308;
+        border: 1px solid rgba(234, 179, 8, 0.3);
+      }
+      .obligation-content {
+        padding: 0 16px 16px 16px;
+        border-top: 1px solid #333;
+        display: none;
+      }
+      .obligation-content.expanded {
+        display: block;
+      }
+      .obligation-text-box {
+        color: #d1d5db;
+        font-size: 14px;
+        line-height: 1.6;
+        padding: 12px;
+        background: #1a1a1a;
+        border-radius: 6px;
+        border: 1px solid #333;
+        margin: 16px 0;
+      }
+      .sanctions-list {
+        color: #fca5a5;
+        font-size: 13px;
+        line-height: 1.8;
+        padding-left: 20px;
+      }
+      .remediation-box {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 16px;
+      }
+      .disclaimer-box {
+        background: rgba(239, 68, 68, 0.05);
+        border: 2px solid rgba(239, 68, 68, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 32px;
+      }
+      .disclaimer-box h3 {
+        color: #ef4444;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+      .disclaimer-box ul {
+        color: #fca5a5;
+        font-size: 14px;
+        line-height: 1.8;
+        padding-left: 20px;
+      }
+      .scope-banner {
+        background: rgba(59, 130, 246, 0.1);
+        border: 2px solid rgba(59, 130, 246, 0.3);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: start;
+        gap: 16px;
+      }
+      .scope-banner-content h4 {
+        color: #60a5fa;
+        font-size: 16px;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      .scope-banner-content p {
+        color: #93c5fd;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .btn-primary {
+        background: #e85d04;
+        color: #121212;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+      }
+      .btn-primary:hover {
+        background: #f77f00;
+        transform: translateY(-1px);
+      }
+      .hidden {
+        display: none;
+      }
+      .overdue-badge {
+        color: #ef4444;
+        font-size: 13px;
+        font-weight: 600;
+        margin-left: 28px;
+        margin-top: 8px;
+      }
+      .fleet-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+      }
+      .metric-card {
+        background: rgba(18, 18, 18, 0.5);
+        border: 1px solid rgba(234, 234, 234, 0.15);
+        border-radius: 12px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+      .metric-card.warning {
+        border-color: #ef4444;
+      }
+      .satellite-list-item {
+        background: rgba(18, 18, 18, 0.5);
+        border: 2px solid #22c55e;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+      .satellite-list-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(232, 93, 4, 0.2);
+      }
+      .satellite-list-item.mostly-compliant {
+        border-color: #eab308;
+      }
+      .satellite-list-item.non-compliant {
+        border-color: #ef4444;
+      }
+      .treaty-badge {
+        display: inline-block;
+        background: rgba(255, 107, 53, 0.1);
+        border: 1px solid rgba(255, 107, 53, 0.3);
+        color: #ff6b35;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-right: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <a href="dashboard.html" class="logo">THE ORB</a>
+        <ul class="nav-menu">
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          <li><a href="tracker_v2.html" class="nav-link">Tracker</a></li>
+          <li><a href="registry.html" class="nav-link">Registry</a></li>
+          <li><a href="insurance_new.html" class="nav-link">Insurance</a></li>
+          <li>
+            <a href="compliance.html" class="nav-link active">Compliance</a>
+          </li>
+        </ul>
+        <div class="user-profile">
+          <div class="user-avatar">SA</div>
+        </div>
+      </nav>
+    </header>
+
+    <div class="top-banner">
+      🛰️ BIG FIVE COMPLIANCE TRACKER - Covering OST • Rescue • Liability •
+      Registration • ITU Radio Regulations
+    </div>
+
+    <div class="view-switcher">
+      <button class="view-btn active" onclick="switchView('satellite')">
+        Satellite View
+      </button>
+      <button class="view-btn" onclick="switchView('fleet')">
+        Fleet Overview
+      </button>
+    </div>
+
+    <div class="container">
+      <div id="satelliteView" class="content">
+        <div class="page-header">
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 16px;
+              margin-bottom: 16px;
+            "
+          >
+            <h1 id="satelliteName">
+              STARLINK-4582 <span class="big-five-badge">BIG FIVE</span>
+            </h1>
+            <select
+              id="satelliteSelector"
+              onchange="changeSatellite()"
+              style="
+                background: rgba(18, 18, 18, 0.7);
+                color: #eaeaea;
+                border: 1px solid rgba(234, 234, 234, 0.15);
+                padding: 8px 16px;
+                border-radius: 6px;
+                cursor: pointer;
+              "
+            >
+              <option value="0">STARLINK-4582</option>
+              <option value="1">SENTINEL-3B</option>
+            </select>
+          </div>
+          <p>
+            Big Five treaty compliance tracking for international space law
+            obligations
+          </p>
+        </div>
+
+        <div class="scope-banner">
+          <span style="font-size: 32px">ℹ️</span>
+          <div class="scope-banner-content">
+            <h4>Scope: Big Five Treaties Only</h4>
+            <p>
+              This tracker covers the five core international space treaties:
+              <strong>Outer Space Treaty (1967)</strong>,
+              <strong>Rescue Agreement (1968)</strong>,
+              <strong>Liability Convention (1972)</strong>,
+              <strong>Registration Convention (1975)</strong>, and
+              <strong>ITU Radio Regulations</strong>. National licensing, export
+              controls, and other regulations are NOT included.
+            </p>
+          </div>
+        </div>
+
+        <div class="demo-selector">
+          <label>Demo Mode - User Tier:</label>
+          <select id="userTierSelector">
+            <option value="public">Public</option>
+            <option value="free">Free Account</option>
+            <option value="premium">Premium</option>
+            <option value="fleet_owner" selected>Fleet Owner</option>
+          </select>
+        </div>
+
+        <div
+          id="complianceOverview"
+          class="compliance-overview mostly-compliant"
+        >
+          <h2 class="section-title">Big Five Compliance Overview</h2>
+          <div class="metrics-grid">
+            <div>
+              <div class="metric">Overall Compliance</div>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div class="metric-value" id="overallScore">87%</div>
+                <span
+                  class="status-badge"
+                  id="statusBadge"
+                  style="background: rgba(234, 179, 8, 0.2); color: #eab308"
+                  >MOSTLY COMPLIANT</span
+                >
+              </div>
+              <div class="progress-bar">
+                <div
+                  class="progress-fill"
+                  id="progressFill"
+                  style="width: 87%; background: #eab308"
+                ></div>
+              </div>
+            </div>
+            <div>
+              <div class="metric">Treaties Applicable</div>
+              <div
+                class="metric-value"
+                style="font-size: 24px"
+                id="treatiesCount"
+              >
+                4/5
+              </div>
+              <div
+                style="
+                  color: #eaeaea;
+                  opacity: 0.7;
+                  font-size: 13px;
+                  margin-top: 4px;
+                "
+              >
+                Big Five treaties
+              </div>
+            </div>
+            <div>
+              <div class="metric">Issues</div>
+              <div id="issuesDisplay"></div>
+            </div>
+            <div>
+              <div class="metric">Last Audit</div>
+              <div
+                style="color: #eaeaea; font-size: 16px; font-weight: 500"
+                id="lastAudit"
+              >
+                2024-03-15
+              </div>
+              <div
+                style="
+                  color: #eaeaea;
+                  opacity: 0.7;
+                  font-size: 13px;
+                  margin-top: 4px;
+                "
+              >
+                Next: <span id="nextAudit">2024-09-15</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="alert('PDF report generation')">
+            <span>📥</span> Download Full Compliance Report (PDF)
+          </button>
+        </div>
+
+        <div class="jurisdiction-card">
+          <div class="jurisdiction-header" onclick="toggleJurisdiction()">
+            <h2 class="section-title" style="margin: 0">
+              <span>🌍</span> Jurisdiction Analysis
+            </h2>
+            <span id="jurisdictionToggle">▼</span>
+          </div>
+          <div class="info-grid">
+            <div class="info-row">
+              <span class="info-label">Primary Launching State</span
+              ><span class="info-value" id="primaryState">USA</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Confidence</span
+              ><span
+                class="info-value"
+                style="color: #22c55e; font-weight: 600"
+                id="confidence"
+                >DEFINITIVE</span
+              >
+            </div>
+            <div class="info-row">
+              <span class="info-label">Basis</span
+              ><span class="info-value" id="basisCount">5 factors</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Determination Date</span
+              ><span class="info-value" id="determinationDate">2024-01-15</span>
+            </div>
+          </div>
+          <div
+            id="jurisdictionDetails"
+            class="hidden"
+            style="
+              margin-top: 24px;
+              padding-top: 24px;
+              border-top: 1px solid rgba(234, 234, 234, 0.15);
+            "
+          >
+            <h3 style="color: #eaeaea; font-size: 16px; margin-bottom: 16px">
+              Determination Factors
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <div class="info-row">
+                <span class="info-label">Operator</span
+                ><span class="info-value" id="operatorInfo">SpaceX (USA)</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Manufacturer</span
+                ><span class="info-value" id="manufacturerInfo"
+                  >SpaceX (USA)</span
+                >
+              </div>
+              <div class="info-row">
+                <span class="info-label">Launch Provider</span
+                ><span class="info-value" id="launchProviderInfo"
+                  >SpaceX (USA)</span
+                >
+              </div>
+              <div class="info-row">
+                <span class="info-label">Launch Site</span
+                ><span class="info-value" id="launchSiteInfo"
+                  >Cape Canaveral (USA)</span
+                >
+              </div>
+              <div class="info-row">
+                <span class="info-label">Registry State</span
+                ><span class="info-value" id="registryStateInfo">USA</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Procuring State</span
+                ><span class="info-value" id="procuringStateInfo">USA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 32px">
+          <h2 class="section-title">Big Five Compliance by Treaty</h2>
+          <div style="margin-bottom: 16px">
+            <span class="treaty-badge">OST 1967</span>
+            <span class="treaty-badge">RESCUE 1968</span>
+            <span class="treaty-badge">LIABILITY 1972</span>
+            <span class="treaty-badge">REG 1975</span>
+            <span class="treaty-badge">ITU RADIO</span>
+          </div>
+          <div id="treatyList"></div>
+        </div>
+
+        <div style="margin-bottom: 32px">
+          <h2
+            style="
+              color: #9ca3af;
+              font-size: 16px;
+              font-weight: 600;
+              margin-bottom: 16px;
+              text-transform: uppercase;
+            "
+          >
+            Treaties Not Applicable
+          </h2>
+          <div
+            id="nonApplicableTreaties"
+            style="
+              background: #1a1a1a;
+              border: 1px solid #333;
+              border-radius: 12px;
+              padding: 20px;
+            "
+          ></div>
+        </div>
+
+        <div class="disclaimer-box">
+          <div style="display: flex; gap: 12px">
+            <span style="color: #ef4444; font-size: 24px">⚠️</span>
+            <div>
+              <h3>⚠️ LIMITATIONS - BIG FIVE SCOPE ONLY</h3>
+              <div style="color: #fca5a5; font-size: 14px; line-height: 1.8">
+                <div style="margin-bottom: 12px">
+                  <strong
+                    >This tool covers the BIG FIVE INTERNATIONAL TREATIES
+                    ONLY.</strong
+                  >
+                  NOT included:
+                </div>
+                <ul>
+                  <li>Moon Agreement (1984) - only 17 parties</li>
+                  <li>National licensing (FCC, FAA/AST, etc.)</li>
+                  <li>Export controls (ITAR/EAR)</li>
+                  <li>National spectrum licensing beyond ITU</li>
+                  <li>UN Debris Mitigation Guidelines (non-binding)</li>
+                  <li>This does NOT constitute legal advice</li>
+                </ul>
+                <div
+                  style="
+                    margin-top: 16px;
+                    padding: 12px;
+                    background: rgba(239, 68, 68, 0.1);
+                    border-radius: 6px;
+                    font-weight: 600;
+                  "
+                >
+                  ⚠️ National authorization is ALWAYS required regardless of Big
+                  Five compliance.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            style="
+              border-top: 1px solid rgba(239, 68, 68, 0.3);
+              padding-top: 16px;
+              margin-top: 16px;
+              color: #fca5a5;
+              font-size: 13px;
+            "
+          >
+            <div>Data source: UN OOSA + ITU</div>
+            <div>Last update: March 10, 2024</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="fleetView" class="content hidden">
+        <div class="page-header">
+          <h1>
+            Fleet Big Five Compliance
+            <span class="big-five-badge">BIG FIVE</span>
+          </h1>
+          <p>Comprehensive compliance overview across your satellite fleet</p>
+        </div>
+
+        <div class="scope-banner">
+          <span style="font-size: 32px">📊</span>
+          <div class="scope-banner-content">
+            <h4>Big Five Treaties Coverage</h4>
+            <p>
+              Tracking compliance across <strong>OST (1967)</strong>,
+              <strong>Rescue (1968)</strong>, <strong>Liability (1972)</strong>,
+              <strong>Registration (1975)</strong>, and
+              <strong>ITU Radio Regulations</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div class="fleet-metrics">
+          <div class="metric-card">
+            <div style="color: #22c55e; margin-bottom: 12px">🛡️</div>
+            <div class="metric">Fleet Compliance</div>
+            <div class="metric-value">89%</div>
+          </div>
+          <div class="metric-card">
+            <div style="color: #22c55e; margin-bottom: 12px">✓</div>
+            <div class="metric">Fully Compliant</div>
+            <div class="metric-value">1/2</div>
+          </div>
+          <div class="metric-card warning">
+            <div style="color: #ef4444; margin-bottom: 12px">⚠️</div>
+            <div class="metric">Critical Issues</div>
+            <div class="metric-value">1</div>
+          </div>
+          <div class="metric-card">
+            <div style="color: #3b82f6; margin-bottom: 12px">📜</div>
+            <div class="metric">Treaties Monitored</div>
+            <div class="metric-value">5</div>
+          </div>
+        </div>
+
+        <div
+          style="
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 32px;
+          "
+        >
+          <h2 class="section-title">Compliance by Treaty (Big Five)</h2>
+          <div id="fleetTreatyProgress"></div>
+        </div>
+
+        <div>
+          <h2 class="section-title">Satellite Compliance Overview</h2>
+          <div id="satelliteListFleet"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const satelliteData = [
+        {
+          satelliteId: "SAT-001",
+          name: "STARLINK-4582",
+          operator: { country: "USA", company: "SpaceX" },
+          manufacturer: { country: "USA", company: "SpaceX" },
+          launchProvider: { country: "USA", company: "SpaceX" },
+          launchSite: { country: "USA", location: "Cape Canaveral" },
+          registryState: "USA",
+          procuringState: "USA",
+          jurisdictionAnalysis: {
+            primaryLaunchingState: "USA",
+            confidence: "DEFINITIVE",
+            basisCount: 5,
+            determinationDate: "2024-01-15",
+            ambiguityFlag: false,
+          },
+          complianceSummary: {
+            overallStatus: "MOSTLY_COMPLIANT",
+            overallScore: 87,
+            criticalViolations: 1,
+            highPriorityIssues: 0,
+            mediumPriorityIssues: 2,
+            compliantObligations: 15,
+            totalObligations: 18,
+            lastAuditDate: "2024-03-15",
+            nextAuditDue: "2024-09-15",
+          },
+          treatyCompliance: [
+            {
+              treatyId: "OST_1967",
+              treatyName: "Outer Space Treaty (1967)",
+              status: "COMPLIANT",
+              score: 100,
+              obligations: [
+                {
+                  obligationId: "OST_003",
+                  articleNumber: "Article III",
+                  obligationType: "INTERNATIONAL_LAW_COMPLIANCE",
+                  obligationText:
+                    "States shall carry on activities in accordance with international law",
+                  complianceStatus: "COMPLIANT",
+                  severity: 1,
+                  potentialSanctions: [
+                    "State responsibility",
+                    "UN Security Council action",
+                  ],
+                  verificationDate: "2024-03-15",
+                },
+              ],
+            },
+            {
+              treatyId: "REG_1975",
+              treatyName: "Registration Convention (1975)",
+              status: "NON_COMPLIANT",
+              score: 50,
+              obligations: [
+                {
+                  obligationId: "REG_003",
+                  articleNumber: "Article IV",
+                  obligationType: "UN_REGISTRATION",
+                  obligationText: "Submit registration to UN",
+                  complianceStatus: "OVERDUE",
+                  severity: 1,
+                  potentialSanctions: ["Violation of treaty", "UN censure"],
+                  daysOverdue: 45,
+                  remediation: {
+                    action: "Submit ST/SG/SER.E form",
+                    assignedTo: "Legal Team",
+                    targetDate: "2024-03-31",
+                    priority: "CRITICAL",
+                  },
+                },
+              ],
+            },
+          ],
+          nonApplicableTreaties: [
+            { treatyName: "Rescue Agreement (1968)", reason: "No crew" },
+          ],
+        },
+        {
+          satelliteId: "SAT-002",
+          name: "SENTINEL-3B",
+          operator: { country: "EU", company: "ESA" },
+          manufacturer: { country: "EU", company: "Thales" },
+          launchProvider: { country: "Russia", company: "Roscosmos" },
+          launchSite: { country: "Russia", location: "Plesetsk" },
+          registryState: "EU",
+          procuringState: "EU",
+          jurisdictionAnalysis: {
+            primaryLaunchingState: "EU",
+            confidence: "DEFINITIVE",
+            basisCount: 3,
+            determinationDate: "2018-04-25",
+          },
+          complianceSummary: {
+            overallStatus: "COMPLIANT",
+            overallScore: 100,
+            criticalViolations: 0,
+            highPriorityIssues: 0,
+            mediumPriorityIssues: 0,
+            compliantObligations: 12,
+            totalObligations: 12,
+            lastAuditDate: "2024-02-20",
+            nextAuditDue: "2024-08-20",
+          },
+          treatyCompliance: [
+            {
+              treatyId: "OST_1967",
+              treatyName: "Outer Space Treaty (1967)",
+              status: "COMPLIANT",
+              score: 100,
+              obligations: [
+                {
+                  obligationId: "OST_003",
+                  articleNumber: "Article III",
+                  obligationType: "INTERNATIONAL_LAW_COMPLIANCE",
+                  obligationText:
+                    "States shall carry on activities in accordance with international law",
+                  complianceStatus: "COMPLIANT",
+                  severity: 1,
+                  potentialSanctions: [],
+                  verificationDate: "2024-02-20",
+                },
+              ],
+            },
+          ],
+          nonApplicableTreaties: [],
+        },
+      ];
+      let currentSatelliteIndex = 0,
+        currentView = "satellite";
+      document.addEventListener("DOMContentLoaded", () => {
+        renderSatelliteView();
+        renderFleetView();
+      });
+      function switchView(v) {
+        currentView = v;
+        const sv = document.getElementById("satelliteView"),
+          fv = document.getElementById("fleetView"),
+          btns = document.querySelectorAll(".view-btn");
+        if (v === "satellite") {
+          sv.classList.remove("hidden");
+          fv.classList.add("hidden");
+          btns[0].classList.add("active");
+          btns[1].classList.remove("active");
+        } else {
+          sv.classList.add("hidden");
+          fv.classList.remove("hidden");
+          btns[0].classList.remove("active");
+          btns[1].classList.add("active");
+        }
+      }
+      function changeSatellite() {
+        currentSatelliteIndex = parseInt(
+          document.getElementById("satelliteSelector").value
+        );
+        renderSatelliteView();
+      }
+      function renderSatelliteView() {
+        const s = satelliteData[currentSatelliteIndex];
+        document.getElementById(
+          "satelliteName"
+        ).innerHTML = `${s.name} <span class="big-five-badge">BIG FIVE</span>`;
+        const o = document.getElementById("complianceOverview");
+        o.className = "compliance-overview";
+        if (s.complianceSummary.overallStatus === "MOSTLY_COMPLIANT")
+          o.classList.add("mostly-compliant");
+        else if (s.complianceSummary.overallStatus === "NON_COMPLIANT")
+          o.classList.add("non-compliant");
+        document.getElementById("overallScore").textContent =
+          s.complianceSummary.overallScore + "%";
+        document.getElementById("treatiesCount").textContent =
+          s.treatyCompliance.length + "/5";
+        document.getElementById("lastAudit").textContent =
+          s.complianceSummary.lastAuditDate;
+        document.getElementById("nextAudit").textContent =
+          s.complianceSummary.nextAuditDue;
+        const sb = document.getElementById("statusBadge"),
+          sc = getStatusColor(s.complianceSummary.overallStatus);
+        sb.textContent = s.complianceSummary.overallStatus.replace("_", " ");
+        sb.style.background = sc + "33";
+        sb.style.color = sc;
+        const pf = document.getElementById("progressFill");
+        pf.style.width = s.complianceSummary.overallScore + "%";
+        pf.style.background = sc;
+        let ih = "";
+        if (s.complianceSummary.criticalViolations > 0)
+          ih += `<div><div style="color:#ef4444;font-size:24px;font-weight:600;">${s.complianceSummary.criticalViolations}</div><div style="color:#ef4444;font-size:11px;text-transform:uppercase;">Critical</div></div>`;
+        if (s.complianceSummary.mediumPriorityIssues > 0)
+          ih += `<div><div style="color:#eab308;font-size:24px;font-weight:600;">${s.complianceSummary.mediumPriorityIssues}</div><div style="color:#eab308;font-size:11px;text-transform:uppercase;">Medium</div></div>`;
+        if (!ih)
+          ih = '<div style="color:#22c55e;font-size:18px;">✓ No issues</div>';
+        document.getElementById("issuesDisplay").innerHTML = ih;
+        document.getElementById("primaryState").textContent =
+          s.jurisdictionAnalysis.primaryLaunchingState;
+        document.getElementById("confidence").textContent =
+          s.jurisdictionAnalysis.confidence;
+        document.getElementById("basisCount").textContent =
+          s.jurisdictionAnalysis.basisCount + " factors";
+        document.getElementById("determinationDate").textContent =
+          s.jurisdictionAnalysis.determinationDate;
+        document.getElementById(
+          "operatorInfo"
+        ).textContent = `${s.operator.company} (${s.operator.country})`;
+        document.getElementById(
+          "manufacturerInfo"
+        ).textContent = `${s.manufacturer.company} (${s.manufacturer.country})`;
+        document.getElementById(
+          "launchProviderInfo"
+        ).textContent = `${s.launchProvider.company} (${s.launchProvider.country})`;
+        document.getElementById(
+          "launchSiteInfo"
+        ).textContent = `${s.launchSite.location} (${s.launchSite.country})`;
+        document.getElementById("registryStateInfo").textContent =
+          s.registryState;
+        document.getElementById("procuringStateInfo").textContent =
+          s.procuringState;
+        renderTreaties(s);
+        renderNonApplicableTreaties(s);
+      }
+      function renderTreaties(s) {
+        const tl = document.getElementById("treatyList");
+        let h = "";
+        s.treatyCompliance.forEach((t) => {
+          const sc = getStatusColor(t.status),
+            bc = t.status === "NON_COMPLIANT" ? "#ef4444" : "#22c55e";
+          h += `<div class="treaty-card ${
+            t.status === "NON_COMPLIANT" ? "non-compliant" : ""
+          }" style="border-color:${bc};"><div class="treaty-header" onclick="toggleTreaty('${
+            t.treatyId
+          }')"><div style="flex:1;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;"><h3 class="treaty-title">${
+            t.treatyName
+          }</h3><span class="status-badge" style="background:${sc}33;color:${sc};">${
+            t.status
+          }</span></div><div class="treaty-meta">${
+            t.obligations.length
+          } obligation(s) • Score: ${
+            t.score
+          }%</div></div><span id="treaty-toggle-${
+            t.treatyId
+          }">▼</span></div><div id="treaty-content-${
+            t.treatyId
+          }" class="treaty-content"><div style="display:flex;flex-direction:column;gap:16px;margin-top:20px;">${renderObligations(
+            t.obligations
+          )}</div></div></div>`;
+        });
+        tl.innerHTML = h;
+      }
+      function renderObligations(obls) {
+        return obls
+          .map((o) => {
+            const sc = getStatusColor(o.complianceStatus),
+              si = getStatusIcon(o.complianceStatus),
+              sb = getSeverityBadge(o.severity);
+            return `<div class="obligation-card" style="border-color:${sc}44;"><div class="obligation-header" onclick="toggleObligation('${
+              o.obligationId
+            }')"><div style="flex:1;"><div class="obligation-title-row"><span style="color:${sc};">${si}</span><span class="obligation-title">${
+              o.articleNumber
+            }: ${o.obligationType.replace(
+              /_/g,
+              " "
+            )}</span>${sb}</div><div style="color:#9ca3af;font-size:13px;margin-left:28px;">${o.obligationText.substring(
+              0,
+              100
+            )}${o.obligationText.length > 100 ? "..." : ""}</div>${
+              o.daysOverdue
+                ? `<div class="overdue-badge">⚠️ OVERDUE by ${o.daysOverdue} days</div>`
+                : ""
+            }</div><span id="obligation-toggle-${
+              o.obligationId
+            }">▼</span></div><div id="obligation-content-${
+              o.obligationId
+            }" class="obligation-content"><div style="margin-top:16px;"><div style="color:#ff6b35;font-size:13px;font-weight:600;margin-bottom:8px;text-transform:uppercase;">Obligation Text</div><div class="obligation-text-box">"${
+              o.obligationText
+            }"</div>${
+              o.potentialSanctions && o.potentialSanctions.length > 0
+                ? `<div style="margin-bottom:16px;"><div style="color:#ff6b35;font-size:13px;font-weight:600;margin-bottom:8px;text-transform:uppercase;">⚖️ Potential Sanctions</div><ul class="sanctions-list">${o.potentialSanctions
+                    .map((s) => `<li>${s}</li>`)
+                    .join("")}</ul></div>`
+                : ""
+            }${
+              o.remediation
+                ? `<div class="remediation-box"><div style="color:#ef4444;font-size:14px;font-weight:600;margin-bottom:12px;text-transform:uppercase;">🔧 Remediation Plan</div><div style="color:#fca5a5;font-size:13px;margin-bottom:12px;"><strong>Action:</strong> ${o.remediation.action}</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;"><div><div style="color:#f87171;font-size:12px;margin-bottom:4px;">Assigned To</div><div style="color:#fff;font-size:13px;">${o.remediation.assignedTo}</div></div><div><div style="color:#f87171;font-size:12px;margin-bottom:4px;">Target Date</div><div style="color:#fff;font-size:13px;">${o.remediation.targetDate}</div></div><div><div style="color:#f87171;font-size:12px;margin-bottom:4px;">Priority</div><div style="color:#fff;font-size:13px;">${o.remediation.priority}</div></div></div></div>`
+                : ""
+            }</div></div></div>`;
+          })
+          .join("");
+      }
+      function renderNonApplicableTreaties(s) {
+        const c = document.getElementById("nonApplicableTreaties");
+        let h = "";
+        if (s.nonApplicableTreaties.length === 0) {
+          h =
+            '<div style="color:#22c55e;text-align:center;padding:20px;">✓ All Big Five treaties applicable</div>';
+        } else {
+          s.nonApplicableTreaties.forEach((t) => {
+            h += `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #333;"><div style="width:8px;height:8px;border-radius:50%;background:#6b7280;"></div><div style="flex:1;"><div style="color:#9ca3af;font-size:14px;font-weight:500;">${t.treatyName}</div><div style="color:#6b7280;font-size:13px;">${t.reason}</div></div></div>`;
+          });
+        }
+        c.innerHTML = h;
+      }
+      function renderFleetView() {
+        const fp = `<div><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><div style="color:#fff;font-size:15px;font-weight:500;">Outer Space Treaty (1967)</div><div style="color:#22c55e;font-size:15px;font-weight:600;">100% (2/2)</div></div><div class="progress-bar" style="margin-bottom:6px;"><div class="progress-fill" style="width:100%;background:#22c55e;"></div></div><div style="color:#9ca3af;font-size:13px;">All satellites compliant</div></div><div><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><div style="color:#fff;font-size:15px;font-weight:500;">Registration Convention (1975)</div><div style="color:#eab308;font-size:15px;font-weight:600;">50% (1/2)</div></div><div class="progress-bar" style="margin-bottom:6px;"><div class="progress-fill" style="width:50%;background:#eab308;"></div></div><div style="color:#fde047;font-size:13px;">1 satellite missing UN registration</div></div><div><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><div style="color:#fff;font-size:15px;font-weight:500;">Liability Convention (1972)</div><div style="color:#22c55e;font-size:15px;font-weight:600;">100% (2/2)</div></div><div class="progress-bar" style="margin-bottom:6px;"><div class="progress-fill" style="width:100%;background:#22c55e;"></div></div><div style="color:#9ca3af;font-size:13px;">All satellites compliant</div></div><div><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><div style="color:#fff;font-size:15px;font-weight:500;">ITU Radio Regulations</div><div style="color:#22c55e;font-size:15px;font-weight:600;">100% (2/2)</div></div><div class="progress-bar" style="margin-bottom:6px;"><div class="progress-fill" style="width:100%;background:#22c55e;"></div></div><div style="color:#9ca3af;font-size:13px;">All licenses valid</div></div><div><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><div style="color:#fff;font-size:15px;font-weight:500;">Rescue Agreement (1968)</div><div style="color:#9ca3af;font-size:15px;font-weight:600;">N/A (0/2)</div></div><div class="progress-bar" style="margin-bottom:6px;"><div class="progress-fill" style="width:0%;background:#6b7280;"></div></div><div style="color:#9ca3af;font-size:13px;">No crewed missions</div></div>`;
+        document.getElementById("fleetTreatyProgress").innerHTML = fp;
+        let sl = "";
+        satelliteData.forEach((s, i) => {
+          const sc = getStatusColor(s.complianceSummary.overallStatus),
+            st = s.complianceSummary.overallStatus
+              .toLowerCase()
+              .replace("_", "-");
+          sl += `<div class="satellite-list-item ${st}" style="border-color:${sc};" onclick="selectSatelliteFromFleet(${i})"><div style="display:flex;justify-content:space-between;align-items:center;"><div><h3 style="color:#fff;font-size:18px;margin-bottom:8px;">${
+            s.name
+          }</h3><div style="color:#9ca3af;font-size:14px;">${s.satelliteId} • ${
+            s.jurisdictionAnalysis.primaryLaunchingState
+          }</div><div style="margin-top:8px;">${s.treatyCompliance
+            .map(
+              (t) =>
+                `<span class="treaty-badge">${t.treatyName
+                  .split("(")[0]
+                  .trim()}</span>`
+            )
+            .join(
+              ""
+            )}</div></div><div style="text-align:right;"><div style="font-size:28px;font-weight:700;color:${sc};">${
+            s.complianceSummary.overallScore
+          }%</div><div style="background:${sc}33;color:${sc};padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600;margin-top:8px;">${s.complianceSummary.overallStatus.replace(
+            "_",
+            " "
+          )}</div></div></div>${
+            s.complianceSummary.criticalViolations > 0
+              ? `<div style="margin-top:16px;padding:12px;background:rgba(239,68,68,0.1);border-radius:8px;display:flex;align-items:center;gap:8px;"><span style="color:#ef4444;">⚠️</span><span style="color:#fca5a5;font-size:14px;font-weight:600;">${s.complianceSummary.criticalViolations} critical violation(s) - Big Five breach</span></div>`
+              : ""
+          }</div>`;
+        });
+        document.getElementById("satelliteListFleet").innerHTML = sl;
+      }
+      function selectSatelliteFromFleet(i) {
+        currentSatelliteIndex = i;
+        document.getElementById("satelliteSelector").value = i;
+        switchView("satellite");
+        renderSatelliteView();
+      }
+      function toggleJurisdiction() {
+        const d = document.getElementById("jurisdictionDetails"),
+          t = document.getElementById("jurisdictionToggle");
+        if (d.classList.contains("hidden")) {
+          d.classList.remove("hidden");
+          t.textContent = "▲";
+        } else {
+          d.classList.add("hidden");
+          t.textContent = "▼";
+        }
+      }
+      function toggleTreaty(tid) {
+        const c = document.getElementById("treaty-content-" + tid),
+          t = document.getElementById("treaty-toggle-" + tid);
+        if (c.classList.contains("expanded")) {
+          c.classList.remove("expanded");
+          t.textContent = "▼";
+        } else {
+          c.classList.add("expanded");
+          t.textContent = "▲";
+        }
+      }
+      function toggleObligation(oid) {
+        const c = document.getElementById("obligation-content-" + oid),
+          t = document.getElementById("obligation-toggle-" + oid);
+        if (c.classList.contains("expanded")) {
+          c.classList.remove("expanded");
+          t.textContent = "▼";
+        } else {
+          c.classList.add("expanded");
+          t.textContent = "▲";
+        }
+      }
+      function getStatusColor(s) {
+        const c = {
+          COMPLIANT: "#22c55e",
+          MOSTLY_COMPLIANT: "#eab308",
+          NON_COMPLIANT: "#ef4444",
+          PENDING: "#3b82f6",
+          OVERDUE: "#dc2626",
+        };
+        return c[s] || "#6b7280";
+      }
+      function getStatusIcon(s) {
+        if (s === "COMPLIANT") return "✓";
+        if (s === "NON_COMPLIANT" || s === "OVERDUE") return "✗";
+        if (s === "PENDING") return "⏱";
+        return "•";
+      }
+      function getSeverityBadge(sev) {
+        const cfg = {
+          1: { label: "CRITICAL", className: "severity-critical" },
+          2: { label: "HIGH", className: "severity-high" },
+          3: { label: "MEDIUM", className: "severity-medium" },
+        };
+        const s = cfg[sev] || cfg[3];
+        return `<span class="severity-badge ${s.className}">${s.label}</span>`;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE ORB - Dashboard</title>
+    <!-- Chart.js for statistics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: #000000;
+        color: #ffffff;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      /* Header Styles */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid #333;
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: #ffffff;
+        text-decoration: none;
+      }
+
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 3rem;
+      }
+
+      .nav-link {
+        color: #cccccc;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: #ff6b35;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b35, #ff8c42);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+
+      .main {
+        padding-top: 70px;
+      }
+
+      /* Hero Section */
+      .hero {
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        background: radial-gradient(
+          circle at 30% 50%,
+          rgba(255, 107, 53, 0.15),
+          transparent 50%
+        );
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+      }
+
+      .hero-text h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 3.5rem;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+      }
+
+      .hero-text p {
+        font-size: 1.2rem;
+        color: #cccccc;
+        margin-bottom: 2rem;
+      }
+
+      .cta-primary {
+        background: linear-gradient(135deg, #ff6b35, #ff8c42);
+        color: #000;
+        border: none;
+        padding: 1rem 2.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .cta-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+      }
+
+      .hero-visual {
+        position: relative;
+        height: 500px;
+      }
+
+      .orb {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 30% 30%,
+          rgba(255, 107, 53, 0.3),
+          rgba(255, 140, 66, 0.1) 40%,
+          transparent 70%
+        );
+        border: 2px solid rgba(255, 107, 53, 0.3);
+        animation: pulse 4s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 0.8;
+        }
+        50% {
+          transform: translate(-50%, -50%) scale(1.05);
+          opacity: 1;
+        }
+      }
+
+      .satellite-bg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(
+            2px 2px at 20% 30%,
+            white,
+            transparent
+          ),
+          radial-gradient(2px 2px at 60% 70%, white, transparent),
+          radial-gradient(1px 1px at 50% 50%, white, transparent),
+          radial-gradient(1px 1px at 80% 10%, white, transparent),
+          radial-gradient(1px 1px at 90% 60%, white, transparent);
+        background-size: 200px 200px;
+        animation: drift 60s linear infinite;
+      }
+
+      @keyframes drift {
+        from {
+          transform: translate(0, 0);
+        }
+        to {
+          transform: translate(-50px, 50px);
+        }
+      }
+
+      /* Dashboard Section */
+      .dashboard {
+        padding: 6rem 0;
+        background: #0a0a0a;
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+      }
+
+      .section-header h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .section-header p {
+        color: #cccccc;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 4rem;
+      }
+
+      .dashboard-card {
+        background: #111111;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 2rem;
+        transition: border-color 0.3s ease;
+      }
+
+      .dashboard-card:hover {
+        border-color: #ff6b35;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+      }
+
+      .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .status-active {
+        background: rgba(46, 213, 115, 0.2);
+        color: #2ed573;
+      }
+
+      .card-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #ff6b35;
+        display: block;
+      }
+
+      .stat-label {
+        color: #cccccc;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .chart-container {
+        height: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <a href="dashboard.html" class="logo">THE ORB</a>
+        <ul class="nav-menu">
+          <li>
+            <a href="dashboard.html" class="nav-link active">Dashboard</a>
+          </li>
+          <li><a href="tracker_v2.html" class="nav-link">Tracker</a></li>
+          <li><a href="registry.html" class="nav-link">Registry</a></li>
+          <li><a href="insurance_new.html" class="nav-link">Insurance</a></li>
+          <li><a href="compliance.html" class="nav-link">Compliance</a></li>
+        </ul>
+        <div class="user-profile">
+          <div class="user-avatar">SA</div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main">
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-text">
+              <h1>Unified Satellite Operations Excellence</h1>
+              <p>
+                Advanced satellite management platform providing comprehensive
+                oversight, real-time tracking, and intelligent analytics for
+                satellite owners, operators, insurers, and regulators worldwide.
+              </p>
+              <button
+                class="cta-primary"
+                onclick="window.location.href='tracker_v2.html'"
+              >
+                EXPLORE PLATFORM
+                <span>→</span>
+              </button>
+            </div>
+            <div class="hero-visual">
+              <div class="orb"></div>
+              <div class="satellite-bg"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard Overview -->
+      <section id="dashboard" class="dashboard">
+        <div class="container">
+          <div class="section-header">
+            <h2>Mission Control Dashboard</h2>
+            <p>
+              Real-time overview of your satellite operations, fleet status, and
+              critical mission parameters
+            </p>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="dashboard-card">
+              <div class="card-header">
+                <h3 class="card-title">Fleet Overview</h3>
+                <span class="status-badge status-active"
+                  >All Systems Operational</span
+                >
+              </div>
+              <div class="card-stats">
+                <div class="stat-item">
+                  <span class="stat-number" id="totalSatellites">50</span>
+                  <span class="stat-label">Active Satellites</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number" id="leoCount">23</span>
+                  <span class="stat-label">LEO Satellites</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">99.7%</span>
+                  <span class="stat-label">Uptime</span>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="fleetChart"></canvas>
+              </div>
+            </div>
+
+            <div class="dashboard-card">
+              <div class="card-header">
+                <h3 class="card-title">Orbital Distribution</h3>
+              </div>
+              <div class="card-stats">
+                <div class="stat-item">
+                  <span class="stat-number" id="meoCount">15</span>
+                  <span class="stat-label">MEO Satellites</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number" id="geoCount">12</span>
+                  <span class="stat-label">GEO Satellites</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">100%</span>
+                  <span class="stat-label">Coverage</span>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="orbitChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Initialize charts
+      function initializeCharts() {
+        // Fleet Chart
+        const fleetCtx = document.getElementById("fleetChart").getContext("2d");
+        new Chart(fleetCtx, {
+          type: "line",
+          data: {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            datasets: [
+              {
+                label: "Active Satellites",
+                data: [42, 45, 47, 48, 49, 50],
+                borderColor: "#ff6b35",
+                backgroundColor: "rgba(255, 107, 53, 0.1)",
+                tension: 0.4,
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                grid: {
+                  color: "#333",
+                },
+                ticks: {
+                  color: "#ccc",
+                },
+              },
+              x: {
+                grid: {
+                  color: "#333",
+                },
+                ticks: {
+                  color: "#ccc",
+                },
+              },
+            },
+          },
+        });
+
+        // Orbit Chart
+        const orbitCtx = document.getElementById("orbitChart").getContext("2d");
+        new Chart(orbitCtx, {
+          type: "doughnut",
+          data: {
+            labels: ["LEO", "MEO", "GEO"],
+            datasets: [
+              {
+                data: [23, 15, 12],
+                backgroundColor: ["#ff6b35", "#ff8c42", "#ffa94d"],
+                borderWidth: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  color: "#ccc",
+                  padding: 15,
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // Load satellite data and update stats
+      async function loadDashboardStats() {
+        try {
+          const response = await fetch(
+            "../../data/satellites_with_tle_n2yo.csv"
+          );
+          const csvText = await response.text();
+          const lines = csvText.trim().split("\n");
+          const headers = lines[0].split(",");
+
+          let leoCount = 0,
+            meoCount = 0,
+            geoCount = 0;
+
+          for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(",");
+            const record = {};
+            headers.forEach((header, index) => {
+              record[header] = values[index];
+            });
+
+            const altitude = parseFloat(record.SEMIMAJOR_AXIS || 0) - 6371;
+            if (altitude < 2000) leoCount++;
+            else if (altitude < 10000) meoCount++;
+            else geoCount++;
+          }
+
+          document.getElementById("totalSatellites").textContent =
+            lines.length - 1;
+          document.getElementById("leoCount").textContent = leoCount;
+          document.getElementById("meoCount").textContent = meoCount;
+          document.getElementById("geoCount").textContent = geoCount;
+        } catch (error) {
+          console.error("Error loading dashboard stats:", error);
+        }
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeCharts();
+        loadDashboardStats();
+      });
+    </script>
+  </body>
+</html>

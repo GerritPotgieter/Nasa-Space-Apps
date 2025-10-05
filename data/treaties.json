@@ -1,0 +1,901 @@
+{
+  "treaties": [
+    {
+      "treatyId": "OST_1967",
+      "treatyName": "Outer Space Treaty",
+      "fullName": "Treaty on Principles Governing the Activities of States in the Exploration and Use of Outer Space, including the Moon and Other Celestial Bodies",
+      "adoptedDate": "1967-01-27",
+      "entryIntoForce": "1967-10-10",
+      "depositary": "United States, United Kingdom, Soviet Union",
+      "parties": 114,
+      "unOosaUrl": "https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/outerspacetreaty.html",
+      "bindingOn": "ALL_PARTIES",
+      "obligations": [
+        {
+          "obligationId": "OST_001",
+          "articleNumber": "Article I",
+          "obligationType": "FREEDOM_OF_EXPLORATION",
+          "obligationText": "The exploration and use of outer space shall be carried out for the benefit and in the interests of all countries and shall be the province of all mankind. Outer space shall be free for exploration and use by all States without discrimination.",
+          "bindingOn": "ALL_PARTIES",
+          "triggers": "ALL_SPACE_ACTIVITIES",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Foundational principle but violations rarely result in immediate sanctions",
+          "potentialSanctions": [
+            "Diplomatic protests",
+            "International criticism",
+            "UN General Assembly resolution"
+          ],
+          "verificationMethod": "Mission profile review",
+          "requiredEvidence": ["Mission objectives document", "Public mission statement"],
+          "complianceChecks": [
+            "Mission serves peaceful purposes",
+            "No exclusive territorial claims",
+            "Results shared with international community"
+          ]
+        },
+        {
+          "obligationId": "OST_002",
+          "articleNumber": "Article II",
+          "obligationType": "NO_SOVEREIGNTY",
+          "obligationText": "Outer space, including the moon and other celestial bodies, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means.",
+          "bindingOn": "ALL_PARTIES",
+          "triggers": "ALL_SPACE_ACTIVITIES",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Core principle of international space law; violations could trigger UN Security Council action",
+          "potentialSanctions": [
+            "UN Security Council intervention",
+            "International condemnation",
+            "Potential economic sanctions",
+            "Invalidation of claimed sovereignty"
+          ],
+          "verificationMethod": "Legal review of mission statements",
+          "requiredEvidence": ["Mission documentation", "Public statements"],
+          "complianceChecks": [
+            "No sovereignty claims in mission documents",
+            "No exclusive use declarations",
+            "No territorial appropriation language"
+          ]
+        },
+        {
+          "obligationId": "OST_003",
+          "articleNumber": "Article III",
+          "obligationType": "INTERNATIONAL_LAW_COMPLIANCE",
+          "obligationText": "States Parties shall carry on activities in the exploration and use of outer space in accordance with international law, including the Charter of the United Nations, in the interest of maintaining international peace and security.",
+          "bindingOn": "ALL_PARTIES",
+          "triggers": "ALL_SPACE_ACTIVITIES",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Links space activities to broader international law framework",
+          "potentialSanctions": [
+            "State responsibility under international law",
+            "UN Security Council action for peace/security violations",
+            "International Court of Justice proceedings"
+          ],
+          "verificationMethod": "Comprehensive legal compliance review",
+          "requiredEvidence": ["Mission authorization", "Legal compliance certification"],
+          "complianceChecks": [
+            "Activities comply with UN Charter",
+            "No threat to international peace and security"
+          ]
+        },
+        {
+          "obligationId": "OST_004",
+          "articleNumber": "Article IV",
+          "obligationType": "WMD_PROHIBITION",
+          "obligationText": "States Parties undertake not to place in orbit around the earth any objects carrying nuclear weapons or any other kinds of weapons of mass destruction, install such weapons on celestial bodies, or station such weapons in outer space in any other manner.",
+          "bindingOn": "ALL_PARTIES",
+          "triggers": "ALL_SATELLITES",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Absolute prohibition; violation would constitute grave breach of international peace and security",
+          "potentialSanctions": [
+            "Immediate UN Security Council action",
+            "International sanctions",
+            "Forced removal of weapons",
+            "Military response authorized under UN Charter"
+          ],
+          "verificationMethod": "Payload inspection and mission documentation review",
+          "requiredEvidence": ["Payload manifest", "Export control documentation", "No weapons certification"],
+          "complianceChecks": [
+            "No nuclear weapons on board",
+            "No biological weapons",
+            "No chemical weapons",
+            "No other WMD"
+          ]
+        },
+        {
+          "obligationId": "OST_005",
+          "articleNumber": "Article IV (Celestial Bodies)",
+          "obligationType": "PEACEFUL_USE_CELESTIAL_BODIES",
+          "obligationText": "The establishment of military bases, installations and fortifications, the testing of any type of weapons and the conduct of military maneuvers on celestial bodies shall be forbidden.",
+          "bindingOn": "ALL_PARTIES",
+          "triggers": "MISSIONS_TO_CELESTIAL_BODIES",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Demilitarization of celestial bodies is absolute",
+          "potentialSanctions": [
+            "UN Security Council enforcement action",
+            "Forced dismantling of installations",
+            "International sanctions"
+          ],
+          "verificationMethod": "Mission profile analysis",
+          "requiredEvidence": ["Landing site plans", "Equipment manifest"],
+          "complianceChecks": [
+            "No military bases or installations",
+            "No weapons testing",
+            "No military maneuvers"
+          ],
+          "applicabilityCondition": "satellite.destination === 'MOON' || satellite.destination === 'CELESTIAL_BODY'"
+        },
+        {
+          "obligationId": "OST_006",
+          "articleNumber": "Article V",
+          "obligationType": "ASTRONAUT_ASSISTANCE",
+          "obligationText": "States Parties shall regard astronauts as envoys of mankind in outer space and shall render to them all possible assistance in the event of accident, distress, or emergency landing.",
+          "bindingOn": "ALL_PARTIES",
+          "triggers": "CREWED_MISSIONS",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Humanitarian obligation",
+          "potentialSanctions": [
+            "Severe diplomatic consequences",
+            "International condemnation"
+          ],
+          "verificationMethod": "Emergency response protocols review",
+          "requiredEvidence": ["Emergency contact procedures", "Crew rescue plan"],
+          "complianceChecks": [
+            "Emergency protocols established",
+            "Coordination with other states arranged"
+          ],
+          "applicabilityCondition": "satellite.crewedMission === true"
+        },
+        {
+          "obligationId": "OST_007",
+          "articleNumber": "Article VI",
+          "obligationType": "STATE_RESPONSIBILITY",
+          "obligationText": "States Parties shall bear international responsibility for national activities in outer space, whether such activities are carried on by governmental agencies or by non-governmental entities. The activities of non-governmental entities in outer space shall require authorization and continuing supervision by the appropriate State Party.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "ALL_SPACE_ACTIVITIES",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Establishes state responsibility for private actors; foundation of space law enforcement",
+          "potentialSanctions": [
+            "State liability for damages caused",
+            "Loss of launch authorization privileges",
+            "International legal claims"
+          ],
+          "verificationMethod": "National authorization verification",
+          "requiredEvidence": ["Government launch license", "National authorization document"],
+          "complianceChecks": [
+            "National government authorization obtained",
+            "Launching state accepts responsibility",
+            "Private operators properly licensed"
+          ]
+        },
+        {
+          "obligationId": "OST_008",
+          "articleNumber": "Article VII",
+          "obligationType": "LAUNCHING_STATE_LIABILITY",
+          "obligationText": "Each State Party that launches or procures the launching of an object into outer space is internationally liable for damage to another State Party by such object or its component parts.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "ALL_SATELLITE_LAUNCHES",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Creates absolute international liability; financial exposure can be massive",
+          "potentialSanctions": [
+            "Unlimited financial liability for damages",
+            "International arbitration",
+            "Diplomatic claims"
+          ],
+          "verificationMethod": "Liability acceptance documentation",
+          "requiredEvidence": ["State liability acceptance letter", "Insurance documentation"],
+          "complianceChecks": [
+            "Launching state identified and accepts liability",
+            "Liability coverage or state guarantee in place"
+          ]
+        },
+        {
+          "obligationId": "OST_009",
+          "articleNumber": "Article VIII",
+          "obligationType": "JURISDICTION_AND_CONTROL",
+          "obligationText": "A State Party which registers an object launched into outer space shall retain jurisdiction and control over such object, and over any personnel thereof, while in outer space or on a celestial body.",
+          "bindingOn": "REGISTRY_STATE",
+          "triggers": "ALL_REGISTERED_SATELLITES",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Establishes ongoing state control",
+          "potentialSanctions": [
+            "Responsibility for satellite actions",
+            "Liability for jurisdictional failures"
+          ],
+          "verificationMethod": "Registry and control documentation",
+          "requiredEvidence": ["Registration documentation", "Control station information"],
+          "complianceChecks": [
+            "State retains jurisdiction over satellite",
+            "Control capability maintained"
+          ]
+        },
+        {
+          "obligationId": "OST_010",
+          "articleNumber": "Article IX",
+          "obligationType": "HARMFUL_CONTAMINATION",
+          "obligationText": "States Parties shall pursue studies of outer space and conduct exploration in such a way as to avoid harmful contamination and also adverse changes in the environment of the Earth resulting from the introduction of extraterrestrial matter.",
+          "bindingOn": "ALL_PARTIES",
+          "triggers": "SAMPLE_RETURN_MISSIONS",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Important for planetary protection",
+          "potentialSanctions": [
+            "Mission delay or cancellation requirements",
+            "Remediation costs"
+          ],
+          "verificationMethod": "Planetary protection plan review",
+          "requiredEvidence": ["Planetary protection plan", "Contamination control procedures"],
+          "complianceChecks": [
+            "Planetary protection category assigned",
+            "Contamination control measures implemented"
+          ],
+          "applicabilityCondition": "satellite.sampleReturn === true"
+        },
+        {
+          "obligationId": "OST_011",
+          "articleNumber": "Article IX (Consultation)",
+          "obligationType": "INTERNATIONAL_CONSULTATION",
+          "obligationText": "If a State Party has reason to believe that an activity or experiment planned by it would cause potentially harmful interference with activities of other States Parties, it shall undertake appropriate international consultations before proceeding.",
+          "bindingOn": "ALL_PARTIES",
+          "triggers": "ACTIVITIES_WITH_POTENTIAL_INTERFERENCE",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Consultation requirement",
+          "potentialSanctions": [
+            "Requirement to halt activities",
+            "International arbitration"
+          ],
+          "verificationMethod": "Consultation record review",
+          "requiredEvidence": ["Interference assessment", "Consultation records"],
+          "complianceChecks": [
+            "Interference potential assessed",
+            "Affected states consulted"
+          ],
+          "applicabilityCondition": "satellite.potentialInterference === true"
+        }
+      ]
+    },
+    {
+      "treatyId": "RESCUE_1968",
+      "treatyName": "Rescue Agreement",
+      "fullName": "Agreement on the Rescue of Astronauts, the Return of Astronauts and the Return of Objects Launched into Outer Space",
+      "adoptedDate": "1968-04-22",
+      "entryIntoForce": "1968-12-03",
+      "depositary": "United States, United Kingdom, Soviet Union",
+      "parties": 98,
+      "unOosaUrl": "https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/rescueagreement.html",
+      "bindingOn": "ALL_PARTIES",
+      "obligations": [
+        {
+          "obligationId": "RESCUE_001",
+          "articleNumber": "Article 1",
+          "obligationType": "NOTIFICATION_OF_ACCIDENTS",
+          "obligationText": "Each Contracting Party which receives information or discovers that the personnel of a spacecraft have suffered accident or are experiencing conditions of distress shall immediately notify the launching authority.",
+          "bindingOn": "ALL_PARTIES",
+          "triggers": "CREWED_MISSIONS",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Critical for astronaut safety",
+          "potentialSanctions": [
+            "Diplomatic consequences",
+            "International condemnation",
+            "Human rights violation charges"
+          ],
+          "verificationMethod": "Emergency notification procedures review",
+          "requiredEvidence": ["Emergency contact list", "Notification protocols"],
+          "complianceChecks": [
+            "24/7 emergency contact established",
+            "Notification procedures documented"
+          ],
+          "applicabilityCondition": "satellite.crewedMission === true"
+        },
+        {
+          "obligationId": "RESCUE_002",
+          "articleNumber": "Article 2",
+          "obligationType": "ASTRONAUT_RESCUE",
+          "obligationText": "If personnel of a spacecraft land in territory under the jurisdiction of a Contracting Party, it shall immediately take all possible steps to rescue them and render them necessary assistance.",
+          "bindingOn": "STATE_WHERE_LANDING_OCCURS",
+          "triggers": "CREWED_SPACECRAFT_LANDING",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Humanitarian obligation; failure endangers human life",
+          "potentialSanctions": [
+            "Severe international condemnation",
+            "Humanitarian law violations"
+          ],
+          "verificationMethod": "Rescue capability assessment",
+          "requiredEvidence": ["Rescue agreements with nations on flight path"],
+          "complianceChecks": [
+            "Overfly permissions include rescue provisions",
+            "Emergency landing sites identified"
+          ],
+          "applicabilityCondition": "satellite.crewedMission === true"
+        },
+        {
+          "obligationId": "RESCUE_003",
+          "articleNumber": "Article 3",
+          "obligationType": "ASTRONAUT_RETURN",
+          "obligationText": "Personnel of a spacecraft who have landed shall be safely and promptly returned to representatives of the launching authority.",
+          "bindingOn": "STATE_WHERE_LANDING_OCCURS",
+          "triggers": "CREWED_SPACECRAFT_LANDING",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Essential for crew safety and sovereignty",
+          "potentialSanctions": [
+            "Diplomatic crisis",
+            "International arbitration"
+          ],
+          "verificationMethod": "Return protocols documentation",
+          "requiredEvidence": ["Crew return agreements"],
+          "complianceChecks": [
+            "Return procedures established",
+            "Diplomatic channels confirmed"
+          ],
+          "applicabilityCondition": "satellite.crewedMission === true"
+        },
+        {
+          "obligationId": "RESCUE_004",
+          "articleNumber": "Article 5",
+          "obligationType": "SPACE_OBJECT_RETURN",
+          "obligationText": "Each Contracting Party which receives information or discovers that a space object has returned to Earth shall notify the launching authority and the Secretary-General of the United Nations.",
+          "bindingOn": "STATE_WHERE_OBJECT_LANDS",
+          "triggers": "SATELLITE_RE-ENTRY",
+          "mandatory": true,
+          "severity": 3,
+          "severityRationale": "Administrative notification",
+          "potentialSanctions": [
+            "Diplomatic note"
+          ],
+          "verificationMethod": "De-orbit notification procedures",
+          "requiredEvidence": ["Re-entry notification plan"],
+          "complianceChecks": [
+            "Re-entry notification procedures exist"
+          ]
+        },
+        {
+          "obligationId": "RESCUE_005",
+          "articleNumber": "Article 5 (Return)",
+          "obligationType": "OBJECT_RECOVERY",
+          "obligationText": "Upon request of the launching authority, objects found beyond the territorial limits of the launching authority shall be returned to or held at the disposal of representatives of the launching authority.",
+          "bindingOn": "STATE_WHERE_OBJECT_LANDS",
+          "triggers": "SATELLITE_DEBRIS_RECOVERY",
+          "mandatory": false,
+          "severity": 3,
+          "severityRationale": "Courtesy obligation",
+          "potentialSanctions": [],
+          "verificationMethod": "Recovery procedures documentation",
+          "requiredEvidence": ["Recovery request procedures"],
+          "complianceChecks": [
+            "Recovery procedures documented"
+          ]
+        }
+      ]
+    },
+    {
+      "treatyId": "LIABILITY_1972",
+      "treatyName": "Liability Convention",
+      "fullName": "Convention on International Liability for Damage Caused by Space Objects",
+      "adoptedDate": "1972-03-29",
+      "entryIntoForce": "1972-09-01",
+      "depositary": "United States, United Kingdom, Soviet Union",
+      "parties": 98,
+      "unOosaUrl": "https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/liability-convention.html",
+      "bindingOn": "LAUNCHING_STATE",
+      "obligations": [
+        {
+          "obligationId": "LIAB_001",
+          "articleNumber": "Article II",
+          "obligationType": "ABSOLUTE_LIABILITY",
+          "obligationText": "A launching State shall be absolutely liable to pay compensation for damage caused by its space object on the surface of the earth or to aircraft flight.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "ALL_SATELLITE_LAUNCHES",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Absolute liability - no fault required; unlimited financial exposure",
+          "potentialSanctions": [
+            "Unlimited financial liability",
+            "International arbitration",
+            "Asset seizure (in extreme cases)"
+          ],
+          "verificationMethod": "Liability acceptance and insurance verification",
+          "requiredEvidence": ["State liability acceptance", "Insurance policy or state guarantee"],
+          "complianceChecks": [
+            "Launching state identified",
+            "State accepts absolute liability",
+            "Financial coverage verified"
+          ]
+        },
+        {
+          "obligationId": "LIAB_002",
+          "articleNumber": "Article III",
+          "obligationType": "FAULT_LIABILITY",
+          "obligationText": "In the event of damage being caused elsewhere than on the surface of the earth to a space object of one launching State by a space object of another launching State, the latter shall be liable only if the damage is due to its fault.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "SATELLITE_COLLISIONS_IN_SPACE",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Fault-based liability in space; requires proof of negligence",
+          "potentialSanctions": [
+            "Financial liability if fault proven",
+            "International arbitration"
+          ],
+          "verificationMethod": "Collision avoidance capabilities assessment",
+          "requiredEvidence": ["Collision avoidance system", "Orbital tracking participation"],
+          "complianceChecks": [
+            "Collision avoidance capability exists",
+            "Tracking data shared",
+            "Maneuver capability maintained"
+          ]
+        },
+        {
+          "obligationId": "LIAB_003",
+          "articleNumber": "Article IV",
+          "obligationType": "EXONERATION_DEFENSE",
+          "obligationText": "A launching State shall not be liable for damage if it establishes that the damage has resulted from gross negligence or from an act done with intent to cause damage on the part of a claimant State.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "DAMAGE_CLAIMS",
+          "mandatory": false,
+          "severity": 3,
+          "severityRationale": "Defensive provision",
+          "potentialSanctions": [],
+          "verificationMethod": "Claims defense documentation",
+          "requiredEvidence": ["Legal defense documentation if needed"],
+          "complianceChecks": [
+            "Legal team prepared for claims defense"
+          ]
+        },
+        {
+          "obligationId": "LIAB_004",
+          "articleNumber": "Article V",
+          "obligationType": "JOINT_LAUNCH_LIABILITY",
+          "obligationText": "Whenever two or more States jointly launch a space object, they shall be jointly and severally liable for any damage caused.",
+          "bindingOn": "ALL_LAUNCHING_STATES",
+          "triggers": "JOINT_LAUNCHES",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Creates shared liability among multiple states",
+          "potentialSanctions": [
+            "Joint and several liability",
+            "Complex international arbitration"
+          ],
+          "verificationMethod": "Joint launch agreement review",
+          "requiredEvidence": ["Joint launch agreement", "Liability allocation agreement"],
+          "complianceChecks": [
+            "All launching states identified",
+            "Liability allocation agreed"
+          ],
+          "applicabilityCondition": "launchingStates.length > 1"
+        },
+        {
+          "obligationId": "LIAB_005",
+          "articleNumber": "Article VI",
+          "obligationType": "LIABILITY_TRANSFER",
+          "obligationText": "States may enter into agreements with regard to the apportioning among themselves of the financial obligation in respect of which they are jointly and severally liable.",
+          "bindingOn": "JOINT_LAUNCHING_STATES",
+          "triggers": "JOINT_LAUNCHES",
+          "mandatory": false,
+          "severity": 3,
+          "severityRationale": "Permissive provision for internal arrangements",
+          "potentialSanctions": [],
+          "verificationMethod": "Inter-state agreements review",
+          "requiredEvidence": ["Cost-sharing agreement"],
+          "complianceChecks": [
+            "Cost allocation agreement exists (if joint launch)"
+          ],
+          "applicabilityCondition": "launchingStates.length > 1"
+        },
+        {
+          "obligationId": "LIAB_006",
+          "articleNumber": "Article IX",
+          "obligationType": "CLAIMS_PRESENTATION",
+          "obligationText": "A claim for compensation for damage shall be presented to a launching State through diplomatic channels.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "DAMAGE_OCCURS",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Procedural requirement for claims",
+          "potentialSanctions": [
+            "Requirement to respond to claims",
+            "Diplomatic consequences if ignored"
+          ],
+          "verificationMethod": "Claims handling procedures",
+          "requiredEvidence": ["Diplomatic claims procedure"],
+          "complianceChecks": [
+            "Diplomatic channel for claims established",
+            "Claims handling authority designated"
+          ]
+        },
+        {
+          "obligationId": "LIAB_007",
+          "articleNumber": "Article XII",
+          "obligationType": "CLAIMS_COMPENSATION",
+          "obligationText": "The compensation which the launching State shall be liable to pay for damage shall be determined in accordance with international law and principles of justice and equity.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "DAMAGE_CLAIMS",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Establishes compensation principles",
+          "potentialSanctions": [
+            "International arbitration if dispute"
+          ],
+          "verificationMethod": "Claims settlement framework",
+          "requiredEvidence": ["Claims settlement procedures"],
+          "complianceChecks": [
+            "Claims valuation methodology established",
+            "Settlement procedures ready"
+          ]
+        }
+      ]
+    },
+    {
+      "treatyId": "REG_1975",
+      "treatyName": "Registration Convention",
+      "fullName": "Convention on Registration of Objects Launched into Outer Space",
+      "adoptedDate": "1975-01-14",
+      "entryIntoForce": "1976-09-15",
+      "depositary": "United Nations",
+      "parties": 72,
+      "unOosaUrl": "https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/registration-convention.html",
+      "bindingOn": "REGISTRY_STATE",
+      "obligations": [
+        {
+          "obligationId": "REG_001",
+          "articleNumber": "Article II",
+          "obligationType": "NATIONAL_REGISTRY",
+          "obligationText": "When a space object is launched into Earth orbit or beyond, the launching State shall register the space object by means of an entry in an appropriate registry which it shall maintain.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "ALL_SATELLITE_LAUNCHES",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Fundamental registration requirement; basis for jurisdiction and liability",
+          "potentialSanctions": [
+            "Violation of treaty obligations",
+            "Jurisdictional complications",
+            "Liability claim difficulties"
+          ],
+          "verificationMethod": "National registry verification",
+          "requiredEvidence": ["National registry entry"],
+          "complianceChecks": [
+            "Satellite registered in national registry",
+            "Registry maintained by launching state"
+          ]
+        },
+        {
+          "obligationId": "REG_002",
+          "articleNumber": "Article III",
+          "obligationType": "UN_NOTIFICATION_TIMING",
+          "obligationText": "The Secretary-General shall maintain a Register in which the information furnished shall be recorded.",
+          "bindingOn": "REGISTRY_STATE",
+          "triggers": "ALL_SATELLITE_LAUNCHES",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Administrative requirement; delays common but rarely sanctioned",
+          "potentialSanctions": [
+            "UN OOSA follow-up requests",
+            "Potential diplomatic note"
+          ],
+          "verificationMethod": "UN OOSA database check",
+          "requiredEvidence": ["UN registration submission confirmation"],
+          "complianceChecks": [
+            "Registration submitted to UN within reasonable timeframe"
+          ],
+          "timeframe": "As soon as practicable (typically 30-90 days)"
+        },
+        {
+          "obligationId": "REG_003",
+          "articleNumber": "Article IV",
+          "obligationType": "REGISTRATION_INFORMATION",
+          "obligationText": "Each State of registry shall furnish to the Secretary-General of the United Nations the following information: (a) Name of launching State; (b) Designator or registration number; (c) Date and location of launch; (d) Basic orbital parameters; (e) General function.",
+          "bindingOn": "REGISTRY_STATE",
+          "triggers": "ALL_SATELLITE_LAUNCHES",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Core registration data required",
+          "potentialSanctions": [
+            "Violation of treaty obligations",
+            "UN censure",
+            "Liability complications"
+          ],
+          "verificationMethod": "UN OOSA registration completeness check",
+          "requiredEvidence": ["ST/SG/SER.E form submission"],
+          "complianceChecks": [
+            "All required data fields completed",
+            "Data accuracy verified"
+          ],
+          "requiredData": [
+            "Name of launching State(s)",
+            "Space object designator",
+            "Date and location of launch",
+            "Nodal period",
+            "Inclination",
+            "Apogee",
+            "Perigee",
+            "General function"
+          ]
+        },
+        {
+          "obligationId": "REG_004",
+          "articleNumber": "Article IV (Updates)",
+          "obligationType": "ORBITAL_CHANGES_NOTIFICATION",
+          "obligationText": "Each State of registry may, from time to time, provide the Secretary-General with additional information concerning a space object carried on its registry.",
+          "bindingOn": "REGISTRY_STATE",
+          "triggers": "SIGNIFICANT_ORBITAL_CHANGES",
+          "mandatory": false,
+          "severity": 3,
+          "severityRationale": "Optional updates; good practice",
+          "potentialSanctions": [],
+          "verificationMethod": "Update tracking",
+          "requiredEvidence": ["Orbital change notifications"],
+          "complianceChecks": [
+            "Major orbital changes reported to UN"
+          ],
+          "applicabilityCondition": "satellite.orbitalChangeSignificant === true"
+        },
+        {
+          "obligationId": "REG_005",
+          "articleNumber": "Article II (Joint Launches)",
+          "obligationType": "JOINT_LAUNCH_COORDINATION",
+          "obligationText": "Where there are two or more launching States in respect of any such space object, they shall jointly determine which one of them shall register the object.",
+          "bindingOn": "ALL_LAUNCHING_STATES",
+          "triggers": "JOINT_LAUNCHES",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "Prevents duplicate or missing registration",
+          "potentialSanctions": [
+            "Jurisdictional confusion",
+            "Liability complications"
+          ],
+          "verificationMethod": "Registration agreement review",
+          "requiredEvidence": ["Registration state determination agreement"],
+          "complianceChecks": [
+            "Registry state designated among launching states",
+            "Agreement documented"
+          ],
+          "applicabilityCondition": "launchingStates.length > 1"
+        }
+      ]
+    },
+    {
+      "treatyId": "ITU_RADIO",
+      "treatyName": "ITU Radio Regulations",
+      "fullName": "International Telecommunication Union Constitution and Radio Regulations",
+      "adoptedDate": "1865-05-17",
+      "entryIntoForce": "Variable (latest WRC updates)",
+      "depositary": "International Telecommunication Union",
+      "parties": 193,
+      "unOosaUrl": "https://www.itu.int/en/ITU-R/space/Pages/default.aspx",
+      "bindingOn": "ALL_ITU_MEMBERS",
+      "obligations": [
+        {
+          "obligationId": "ITU_001",
+          "articleNumber": "Article 4 (Radio Regulations)",
+          "obligationType": "NATIONAL_AUTHORIZATION",
+          "obligationText": "All stations must be established and operated in such a manner as not to cause harmful interference to the radio services or communications of other Member States.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "USE_OF_RADIO_FREQUENCIES",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Critical for spectrum management; interference can result in operational shutdown",
+          "potentialSanctions": [
+            "Frequency use suspension",
+            "ITU sanctions",
+            "National regulatory fines",
+            "Forced frequency change"
+          ],
+          "verificationMethod": "National frequency authorization verification",
+          "requiredEvidence": ["National spectrum license"],
+          "complianceChecks": [
+            "National frequency license obtained",
+            "License current and valid"
+          ],
+          "applicabilityCondition": "satellite.usesRadioFrequencies === true"
+        },
+        {
+          "obligationId": "ITU_002",
+          "articleNumber": "Article 9 (Radio Regulations)",
+          "obligationType": "ITU_FREQUENCY_COORDINATION",
+          "obligationText": "Administrations shall coordinate frequency assignments for space stations with other administrations in accordance with ITU Radio Regulations.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "USE_OF_RADIO_FREQUENCIES",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "International coordination required to prevent interference",
+          "potentialSanctions": [
+            "Coordination disputes",
+            "ITU enforcement action",
+            "Frequency reassignment requirements"
+          ],
+          "verificationMethod": "ITU filing verification",
+          "requiredEvidence": ["ITU advance publication filing", "ITU coordination completion"],
+          "complianceChecks": [
+            "ITU coordination filing submitted",
+            "Coordination with affected administrations completed"
+          ],
+          "applicabilityCondition": "satellite.usesRadioFrequencies === true"
+        },
+        {
+          "obligationId": "ITU_003",
+          "articleNumber": "Article 11 (Radio Regulations)",
+          "obligationType": "ITU_NOTIFICATION",
+          "obligationText": "Assignments to stations in the space services shall be notified to the ITU Radiocommunication Bureau in accordance with the procedures of the Radio Regulations.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "USE_OF_RADIO_FREQUENCIES",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Required for international frequency protection",
+          "potentialSanctions": [
+            "Loss of frequency protection",
+            "Interference from later systems"
+          ],
+          "verificationMethod": "ITU Master Register check",
+          "requiredEvidence": ["ITU notification filing", "Master Register inscription"],
+          "complianceChecks": [
+            "ITU notification submitted within timeframe",
+            "Frequency assignment protected internationally"
+          ],
+          "applicabilityCondition": "satellite.usesRadioFrequencies === true"
+        },
+        {
+          "obligationId": "ITU_004",
+          "articleNumber": "Article 15 (Radio Regulations)",
+          "obligationType": "NO_HARMFUL_INTERFERENCE",
+          "obligationText": "All stations are forbidden to cause harmful interference. If harmful interference is caused, the administration shall eliminate it with the least possible delay.",
+          "bindingOn": "ALL_OPERATORS",
+          "triggers": "RADIO_FREQUENCY_OPERATIONS",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Active interference must be resolved immediately",
+          "potentialSanctions": [
+            "Immediate shutdown order",
+            "Interference penalties",
+            "Liability for affected systems"
+          ],
+          "verificationMethod": "Interference monitoring",
+          "requiredEvidence": ["Interference monitoring reports"],
+          "complianceChecks": [
+            "No interference complaints received",
+            "Monitoring systems in place"
+          ],
+          "applicabilityCondition": "satellite.usesRadioFrequencies === true"
+        },
+        {
+          "obligationId": "ITU_005",
+          "articleNumber": "GEO Orbital Slot",
+          "obligationType": "GEO_SLOT_ALLOCATION",
+          "obligationText": "For geostationary satellites, orbital slots must be coordinated and registered with ITU to ensure equitable access to the geostationary orbit.",
+          "bindingOn": "LAUNCHING_STATE",
+          "triggers": "GEOSTATIONARY_ORBIT",
+          "mandatory": true,
+          "severity": 1,
+          "severityRationale": "GEO slots are limited resource; unauthorized use violates international law",
+          "potentialSanctions": [
+            "Removal from orbital slot required",
+            "Loss of frequency rights",
+            "International arbitration"
+          ],
+          "verificationMethod": "ITU GEO filing verification",
+          "requiredEvidence": ["ITU GEO filing", "Orbital slot allocation"],
+          "complianceChecks": [
+            "GEO slot filed with ITU",
+            "Satellite positioned within allocated slot"
+          ],
+          "applicabilityCondition": "satellite.orbit === 'GEO'"
+        },
+        {
+          "obligationId": "ITU_006",
+          "articleNumber": "Technical Standards",
+          "obligationType": "TECHNICAL_COMPLIANCE",
+          "obligationText": "Space stations shall comply with technical parameters specified in ITU Radio Regulations and frequency authorizations.",
+          "bindingOn": "ALL_OPERATORS",
+          "triggers": "RADIO_FREQUENCY_OPERATIONS",
+          "mandatory": true,
+          "severity": 2,
+          "severityRationale": "Technical non-compliance can cause widespread interference",
+          "potentialSanctions": [
+            "Operational restrictions",
+            "Equipment modification requirements"
+          ],
+          "verificationMethod": "Technical specification verification",
+          "requiredEvidence": ["Equipment certification", "Technical compliance test results"],
+          "complianceChecks": [
+            "Equipment meets ITU technical standards",
+            "Power levels within authorized limits"
+          ],
+          "applicabilityCondition": "satellite.usesRadioFrequencies === true"
+        }
+      ]
+    }
+  ],
+  "stateRatifications": {
+    "USA": {
+      "OST_1967": { "status": "RATIFIED", "date": "1967-10-10", "reservations": null },
+      "RESCUE_1968": { "status": "RATIFIED", "date": "1968-12-03", "reservations": null },
+      "LIABILITY_1972": { "status": "RATIFIED", "date": "1973-09-09", "reservations": null },
+      "REG_1975": { "status": "RATIFIED", "date": "1976-09-15", "reservations": null },
+      "ITU_RADIO": { "status": "MEMBER", "date": "1932-01-01", "reservations": null }
+    },
+    "Russia": {
+      "OST_1967": { "status": "RATIFIED", "date": "1967-10-10", "reservations": null },
+      "RESCUE_1968": { "status": "RATIFIED", "date": "1968-12-03", "reservations": null },
+      "LIABILITY_1972": { "status": "RATIFIED", "date": "1973-11-09", "reservations": null },
+      "REG_1975": { "status": "RATIFIED", "date": "1978-02-04", "reservations": null },
+      "ITU_RADIO": { "status": "MEMBER", "date": "1932-01-01", "reservations": null }
+    },
+    "China": {
+      "OST_1967": { "status": "RATIFIED", "date": "1983-12-30", "reservations": null },
+      "RESCUE_1968": { "status": "RATIFIED", "date": "1988-12-16", "reservations": null },
+      "LIABILITY_1972": { "status": "RATIFIED", "date": "1988-12-05", "reservations": null },
+      "REG_1975": { "status": "RATIFIED", "date": "1988-12-12", "reservations": null },
+      "ITU_RADIO": { "status": "MEMBER", "date": "1932-01-01", "reservations": null }
+    },
+    "EU": {
+      "OST_1967": { "status": "RATIFIED", "date": "Various (member states)", "reservations": null },
+      "RESCUE_1968": { "status": "RATIFIED", "date": "Various (member states)", "reservations": null },
+      "LIABILITY_1972": { "status": "RATIFIED", "date": "Various (member states)", "reservations": null },
+      "REG_1975": { "status": "RATIFIED", "date": "Various (member states)", "reservations": null },
+      "ITU_RADIO": { "status": "MEMBER", "date": "Various (member states)", "reservations": null }
+    },
+    "Japan": {
+      "OST_1967": { "status": "RATIFIED", "date": "1967-10-10", "reservations": null },
+      "RESCUE_1968": { "status": "RATIFIED", "date": "1968-12-03", "reservations": null },
+      "LIABILITY_1972": { "status": "RATIFIED", "date": "1983-06-20", "reservations": null },
+      "REG_1975": { "status": "RATIFIED", "date": "1983-06-20", "reservations": null },
+      "ITU_RADIO": { "status": "MEMBER", "date": "1932-01-01", "reservations": null }
+    },
+    "India": {
+      "OST_1967": { "status": "RATIFIED", "date": "1982-01-18", "reservations": null },
+      "RESCUE_1968": { "status": "RATIFIED", "date": "1982-01-18", "reservations": null },
+      "LIABILITY_1972": { "status": "RATIFIED", "date": "1982-01-18", "reservations": null },
+      "REG_1975": { "status": "RATIFIED", "date": "1982-01-18", "reservations": null },
+      "ITU_RADIO": { "status": "MEMBER", "date": "1932-01-01", "reservations": null }
+    },
+    "UK": {
+      "OST_1967": { "status": "RATIFIED", "date": "1967-10-10", "reservations": null },
+      "RESCUE_1968": { "status": "RATIFIED", "date": "1968-12-03", "reservations": null },
+      "LIABILITY_1972": { "status": "RATIFIED", "date": "1974-06-20", "reservations": null },
+      "REG_1975": { "status": "RATIFIED", "date": "1978-06-15", "reservations": null },
+      "ITU_RADIO": { "status": "MEMBER", "date": "1932-01-01", "reservations": null }
+    },
+    "France": {
+      "OST_1967": { "status": "RATIFIED", "date": "1970-08-05", "reservations": null },
+      "RESCUE_1968": { "status": "RATIFIED", "date": "1970-05-18", "reservations": null },
+      "LIABILITY_1972": { "status": "RATIFIED", "date": "1975-03-11", "reservations": null },
+      "REG_1975": { "status": "RATIFIED", "date": "1978-09-07", "reservations": null },
+      "ITU_RADIO": { "status": "MEMBER", "date": "1932-01-01", "reservations": null }
+    },
+    "Germany": {
+      "OST_1967": { "status": "RATIFIED", "date": "1971-11-10", "reservations": null },
+      "RESCUE_1968": { "status": "RATIFIED", "date": "1971-11-10", "reservations": null },
+      "LIABILITY_1972": { "status": "RATIFIED", "date": "1975-01-23", "reservations": null },
+      "REG_1975": { "status": "RATIFIED", "date": "1979-08-16", "reservations": null },
+      "ITU_RADIO": { "status": "MEMBER", "date": "1932-01-01", "reservations": null }
+    },
+    "Canada": {
+      "OST_1967": { "status": "RATIFIED", "date": "1967-10-10", "reservations": null },
+      "RESCUE_1968": { "status": "RATIFIED", "date": "1975-08-06", "reservations": null },
+      "LIABILITY_1972": { "status": "RATIFIED", "date": "1975-08-06", "reservations": null },
+      "REG_1975": { "status": "RATIFIED", "date": "1975-09-24", "reservations": null },
+      "ITU_RADIO": { "status": "MEMBER", "date": "1932-01-01", "reservations": null }
+    }
+  },
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2024-03-10",
+    "dataSource": "UN Office for Outer Space Affairs (UNOOSA) + ITU",
+    "nextScheduledUpdate": "2024-04-10",
+    "updateFrequency": "MONTHLY",
+    "maintainer": "The Orb Legal Compliance Team",
+    "notes": "This database covers only the Big Five space treaties: Outer Space Treaty (1967), Rescue Agreement (1968), Liability Convention (1972), Registration Convention (1975), and ITU Radio Regulations. National licensing requirements, export controls (ITAR/EAR), and other regulations are NOT included.",
+    "totalTreaties": 5,
+    "totalObligations": 42,
+    "totalStates": 10
+  }
+}
