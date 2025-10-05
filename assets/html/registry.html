@@ -353,6 +353,136 @@
         font-weight: 600;
         font-size: 0.9rem;
       }
+
+      /* Table Row Click Effect */
+      .data-table tbody tr {
+        cursor: pointer;
+      }
+
+      /* Comprehensive Detail Modal Styles */
+      .detail-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 3000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        overflow-y: auto;
+      }
+
+      .detail-modal.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .detail-modal-content {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: rgba(18, 18, 18, 0.95);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .detail-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e85d04;
+      }
+
+      .detail-modal-header h2 {
+        font-size: 2rem;
+        color: #e85d04;
+        margin: 0;
+      }
+
+      .detail-modal-close {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.5rem;
+        transition: background 0.3s ease;
+      }
+
+      .detail-modal-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .detail-sections {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+      }
+
+      .detail-section {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .detail-section h3 {
+        color: #e85d04;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+
+      .detail-row-label {
+        color: #888;
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      .detail-row-value {
+        color: #fff;
+        font-weight: 600;
+        text-align: right;
+        font-size: 0.9rem;
+        word-break: break-word;
+        max-width: 60%;
+      }
+
+      .tle-section {
+        grid-column: 1 / -1;
+        background: rgba(232, 93, 4, 0.05);
+        border-color: rgba(232, 93, 4, 0.3);
+      }
+
+      .tle-line {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 0.75rem;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 0.85rem;
+        color: #0f0;
+        margin: 0.5rem 0;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
     </style>
   </head>
   <body>
@@ -361,11 +491,9 @@
       <nav class="nav">
         <a href="dashboard.html" class="logo">THE ORB</a>
         <ul class="nav-menu">
-          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
           <li><a href="tracker_v2.html" class="nav-link">Tracker</a></li>
           <li><a href="registry.html" class="nav-link active">Registry</a></li>
-          <li><a href="insurance_new.html" class="nav-link">Insurance</a></li>
-          <li><a href="compliance.html" class="nav-link">Compliance</a></li>
+          <li><a href="tools.html" class="nav-link">Tools</a></li>
         </ul>
         <div class="user-profile">
           <div class="user-avatar">SA</div>
@@ -439,9 +567,16 @@
               </div>
 
               <div class="filter-group">
-                <span class="filter-label">Owner:</span>
-                <select class="filter-select" id="ownerFilter">
+                <span class="filter-label">Country:</span>
+                <select class="filter-select" id="countryFilter">
                   <option value="all">All Countries</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <span class="filter-label">Organization:</span>
+                <select class="filter-select" id="organizationFilter">
+                  <option value="all">All Organizations</option>
                 </select>
               </div>
 
@@ -498,7 +633,8 @@
         search: "",
         status: "all",
         type: "all",
-        owner: "all",
+        country: "all",
+        organization: "all",
         sort: "name",
       };
 
@@ -550,8 +686,9 @@
 
           console.log(`Loaded ${allSatellites.length} satellites`);
 
-          // Populate owner filter dropdown
-          populateOwnerFilter();
+          // Populate filter dropdowns
+          populateCountryFilter();
+          populateOrganizationFilter();
 
           // Update stats
           updateStats();
@@ -566,23 +703,52 @@
         }
       }
 
-      // Populate owner dropdown with unique countries
-      function populateOwnerFilter() {
-        const owners = new Set();
+      // Populate country filter with unique countries (2-3 letter codes)
+      function populateCountryFilter() {
+        const countries = new Set();
         allSatellites.forEach((sat) => {
-          const owner = sat.Owner || sat.State;
-          if (owner && owner.trim()) {
-            owners.add(owner.trim());
+          const state = sat.State || sat.Owner;
+          if (state && state.trim()) {
+            const trimmed = state.trim();
+            // Only add if it looks like a country code (2-3 letters, all uppercase)
+            if (
+              trimmed.length <= 3 &&
+              trimmed === trimmed.toUpperCase() &&
+              /^[A-Z]+$/.test(trimmed)
+            ) {
+              countries.add(trimmed);
+            }
           }
         });
 
-        const sortedOwners = Array.from(owners).sort();
-        const select = document.getElementById("ownerFilter");
+        const sortedCountries = Array.from(countries).sort();
+        const select = document.getElementById("countryFilter");
 
-        sortedOwners.forEach((owner) => {
+        sortedCountries.forEach((country) => {
           const option = document.createElement("option");
-          option.value = owner;
-          option.textContent = owner;
+          option.value = country;
+          option.textContent = country;
+          select.appendChild(option);
+        });
+      }
+
+      // Populate organization filter with unique organizations (non-country codes)
+      function populateOrganizationFilter() {
+        const organizations = new Set();
+        allSatellites.forEach((sat) => {
+          const orgName = sat.Org_Name;
+          if (orgName && orgName.trim() && orgName.trim() !== "-") {
+            organizations.add(orgName.trim());
+          }
+        });
+
+        const sortedOrgs = Array.from(organizations).sort();
+        const select = document.getElementById("organizationFilter");
+
+        sortedOrgs.forEach((org) => {
+          const option = document.createElement("option");
+          option.value = org;
+          option.textContent = org;
           select.appendChild(option);
         });
       }
@@ -635,10 +801,16 @@
             if (filters.type === "C" && !type.startsWith("C")) return false;
           }
 
-          // Owner filter
-          if (filters.owner !== "all") {
-            const owner = sat.Owner || sat.State || "";
-            if (owner.trim() !== filters.owner) return false;
+          // Country filter
+          if (filters.country !== "all") {
+            const state = sat.State || sat.Owner || "";
+            if (state.trim() !== filters.country) return false;
+          }
+
+          // Organization filter
+          if (filters.organization !== "all") {
+            const org = sat.Org_Name || "";
+            if (org.trim() !== filters.organization) return false;
           }
 
           return true;
@@ -705,7 +877,7 @@
         const pageSatellites = filteredSatellites.slice(startIndex, endIndex);
 
         const tableHTML = pageSatellites
-          .map((sat) => {
+          .map((sat, index) => {
             const name = sat.Name || "Unknown";
             const norad = sat.JCAT || "N/A";
             const type = getTypeLabel(sat.Type || "");
@@ -715,7 +887,9 @@
             const dest = sat.Dest || sat.Primary || "Unknown";
 
             return `
-                    <tr>
+                    <tr onclick="showSatelliteDetail(${
+                      startIndex + index
+                    })" style="cursor: pointer;">
                         <td><strong>${name}</strong></td>
                         <td>${norad}</td>
                         <td>${type}</td>
@@ -771,6 +945,233 @@
           currentPage === totalPages;
       }
 
+      // Data sanitization helper function
+      function sanitizeValue(value, options = {}) {
+        if (value === null || value === undefined || value === "") {
+          return options.default || "-";
+        }
+
+        // Convert to string and trim
+        let cleaned = String(value).trim();
+
+        // Remove extra quotes
+        cleaned = cleaned.replace(/^["']+|["']+$/g, "");
+
+        // Remove multiple spaces
+        cleaned = cleaned.replace(/\s+/g, " ");
+
+        // Handle common placeholder values
+        if (
+          cleaned === "" ||
+          cleaned === "null" ||
+          cleaned === "undefined" ||
+          cleaned === "N/A" ||
+          cleaned === "n/a" ||
+          cleaned === "-" ||
+          cleaned === "?"
+        ) {
+          return options.default || "-";
+        }
+
+        // Apply unit if provided
+        if (options.unit && cleaned !== "-") {
+          return `${cleaned} ${options.unit}`;
+        }
+
+        // Apply suffix if provided
+        if (options.suffix && cleaned !== "-") {
+          return `${cleaned}${options.suffix}`;
+        }
+
+        return cleaned;
+      }
+
+      // Format coordinates
+      function formatCoordinates(lat, lon) {
+        const cleanLat = sanitizeValue(lat);
+        const cleanLon = sanitizeValue(lon);
+
+        if (cleanLat === "-" || cleanLon === "-") {
+          return "-";
+        }
+
+        return `${cleanLat}°, ${cleanLon}°`;
+      }
+
+      // Show comprehensive satellite detail modal
+      function showSatelliteDetail(index) {
+        const satData = filteredSatellites[index];
+        if (!satData) return;
+
+        // Populate modal header
+        document.getElementById("modalSatName").textContent = sanitizeValue(
+          satData.Name || satData.OBJECT_NAME,
+          { default: "Unknown Satellite" }
+        );
+
+        // Identification
+        document.getElementById("modal_name").textContent = sanitizeValue(
+          satData.Name
+        );
+        document.getElementById("modal_jcat").textContent = sanitizeValue(
+          satData.JCAT || satData.NORAD_CAT_ID
+        );
+        document.getElementById("modal_object_name").textContent =
+          sanitizeValue(satData.OBJECT_NAME);
+        document.getElementById("modal_launch_tag").textContent = sanitizeValue(
+          satData.SatcatLaunch_Tag
+        );
+        document.getElementById("modal_type").textContent = sanitizeValue(
+          satData.Type
+        );
+        document.getElementById("modal_status").textContent = sanitizeValue(
+          satData.STATUS || satData.Status
+        );
+
+        // Ownership
+        document.getElementById("modal_owner").textContent = sanitizeValue(
+          satData.Owner
+        );
+        document.getElementById("modal_state").textContent = sanitizeValue(
+          satData.State
+        );
+        document.getElementById("modal_org_name").textContent = sanitizeValue(
+          satData.Org_Name
+        );
+        document.getElementById("modal_org_short").textContent = sanitizeValue(
+          satData.Org_ShortName
+        );
+        document.getElementById("modal_org_location").textContent =
+          sanitizeValue(satData.Org_Location);
+        document.getElementById("modal_org_coords").textContent =
+          formatCoordinates(satData.Org_Latitude, satData.Org_Longitude);
+        document.getElementById("modal_manufacturer").textContent =
+          sanitizeValue(satData.Manufacturer);
+
+        // Launch Information
+        document.getElementById("modal_ldate").textContent = sanitizeValue(
+          satData.LDate
+        );
+        document.getElementById("modal_sdate").textContent = sanitizeValue(
+          satData.SDate
+        );
+        document.getElementById("modal_odate").textContent = sanitizeValue(
+          satData.ODate
+        );
+        document.getElementById("modal_ddate").textContent = sanitizeValue(
+          satData.DDate
+        );
+        document.getElementById("modal_primary").textContent = sanitizeValue(
+          satData.Primary
+        );
+
+        // Orbital Parameters
+        document.getElementById("modal_perigee").textContent = sanitizeValue(
+          satData.Perigee,
+          { unit: "km" }
+        );
+        document.getElementById("modal_apogee").textContent = sanitizeValue(
+          satData.Apogee,
+          { unit: "km" }
+        );
+        document.getElementById("modal_inclination").textContent =
+          sanitizeValue(satData.INCLINATION || satData.Inc, { suffix: "°" });
+        document.getElementById("modal_eccentricity").textContent =
+          sanitizeValue(satData.ECCENTRICITY);
+        document.getElementById("modal_mean_motion").textContent =
+          sanitizeValue(satData.MEAN_MOTION, { unit: "rev/day" });
+        document.getElementById("modal_epoch").textContent = sanitizeValue(
+          satData.EPOCH
+        );
+        document.getElementById("modal_rev_epoch").textContent = sanitizeValue(
+          satData.REV_AT_EPOCH
+        );
+
+        // Physical Characteristics
+        document.getElementById("modal_mass").textContent = sanitizeValue(
+          satData.Mass,
+          { unit: "kg" }
+        );
+        document.getElementById("modal_drymass").textContent = sanitizeValue(
+          satData.DryMass,
+          { unit: "kg" }
+        );
+        document.getElementById("modal_totmass").textContent = sanitizeValue(
+          satData.TotMass,
+          { unit: "kg" }
+        );
+        document.getElementById("modal_length").textContent = sanitizeValue(
+          satData.Length,
+          { unit: "m" }
+        );
+        document.getElementById("modal_diameter").textContent = sanitizeValue(
+          satData.Diamete,
+          { unit: "m" }
+        );
+        document.getElementById("modal_span").textContent = sanitizeValue(
+          satData.Span,
+          { unit: "m" }
+        );
+        document.getElementById("modal_shape").textContent = sanitizeValue(
+          satData.Shape
+        );
+
+        // Advanced Orbital Data
+        document.getElementById("modal_ra_node").textContent = sanitizeValue(
+          satData.RA_OF_ASC_NODE,
+          { suffix: "°" }
+        );
+        document.getElementById("modal_arg_peri").textContent = sanitizeValue(
+          satData.ARG_OF_PERICENTER,
+          { suffix: "°" }
+        );
+        document.getElementById("modal_mean_anomaly").textContent =
+          sanitizeValue(satData.MEAN_ANOMALY, { suffix: "°" });
+        document.getElementById("modal_bstar").textContent = sanitizeValue(
+          satData.BSTAR
+        );
+        document.getElementById("modal_mm_dot").textContent = sanitizeValue(
+          satData.MEAN_MOTION_DOT
+        );
+        document.getElementById("modal_mm_ddot").textContent = sanitizeValue(
+          satData.MEAN_MOTION_DDOT
+        );
+        document.getElementById("modal_element_set").textContent =
+          sanitizeValue(satData.ELEMENT_SET_NO);
+
+        // TLE Data (if available)
+        const tleFetched = satData.TLE_FETCHED === "YES";
+        const tleSection = document.getElementById("tleSection");
+
+        if (tleFetched) {
+          tleSection.style.display = "block";
+          document.getElementById("modal_tle_fetched").textContent = "✓ Yes";
+          document.getElementById("modal_n2yo_name").textContent =
+            sanitizeValue(satData.N2YO_SAT_NAME);
+          document.getElementById("modal_tle_line1").textContent =
+            sanitizeValue(satData.TLE_LINE1);
+          document.getElementById("modal_tle_line2").textContent =
+            sanitizeValue(satData.TLE_LINE2);
+        } else {
+          tleSection.style.display = "none";
+        }
+
+        // Show modal
+        document.getElementById("detailModal").classList.add("active");
+      }
+
+      // Close detail modal
+      function closeDetailModal() {
+        document.getElementById("detailModal").classList.remove("active");
+      }
+
+      // ESC key to close modal
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeDetailModal();
+        }
+      });
+
       // Event listeners
       document.addEventListener("DOMContentLoaded", function () {
         initializeTableData();
@@ -811,11 +1212,19 @@
             });
           });
 
-        // Owner filter
+        // Country filter
         document
-          .getElementById("ownerFilter")
+          .getElementById("countryFilter")
           .addEventListener("change", function () {
-            filters.owner = this.value;
+            filters.country = this.value;
+            applyFilters();
+          });
+
+        // Organization filter
+        document
+          .getElementById("organizationFilter")
+          .addEventListener("change", function () {
+            filters.organization = this.value;
             applyFilters();
           });
 
@@ -860,5 +1269,234 @@
         });
       });
     </script>
+
+    <!-- Comprehensive Satellite Detail Modal (same HTML as tracker_v2.html) -->
+    <div class="detail-modal" id="detailModal">
+      <div class="detail-modal-content">
+        <div class="detail-modal-header">
+          <h2 id="modalSatName">Satellite Details</h2>
+          <button class="detail-modal-close" onclick="closeDetailModal()">
+            ×
+          </button>
+        </div>
+
+        <div class="detail-sections">
+          <!-- Identification Section -->
+          <div class="detail-section">
+            <h3>🛰️ Identification</h3>
+            <div class="detail-row">
+              <span class="detail-row-label">Name</span>
+              <span class="detail-row-value" id="modal_name">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">NORAD Cat ID</span>
+              <span class="detail-row-value" id="modal_jcat">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Object Name</span>
+              <span class="detail-row-value" id="modal_object_name">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Launch Tag</span>
+              <span class="detail-row-value" id="modal_launch_tag">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Type</span>
+              <span class="detail-row-value" id="modal_type">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Status</span>
+              <span class="detail-row-value" id="modal_status">-</span>
+            </div>
+          </div>
+
+          <!-- Ownership Section -->
+          <div class="detail-section">
+            <h3>🌍 Ownership & Origin</h3>
+            <div class="detail-row">
+              <span class="detail-row-label">Owner Code</span>
+              <span class="detail-row-value" id="modal_owner">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">State</span>
+              <span class="detail-row-value" id="modal_state">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Organization</span>
+              <span class="detail-row-value" id="modal_org_name">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Organization (Short)</span>
+              <span class="detail-row-value" id="modal_org_short">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Location</span>
+              <span class="detail-row-value" id="modal_org_location">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Coordinates</span>
+              <span class="detail-row-value" id="modal_org_coords">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Manufacturer</span>
+              <span class="detail-row-value" id="modal_manufacturer">-</span>
+            </div>
+          </div>
+
+          <!-- Launch Information -->
+          <div class="detail-section">
+            <h3>🚀 Launch Information</h3>
+            <div class="detail-row">
+              <span class="detail-row-label">Launch Date</span>
+              <span class="detail-row-value" id="modal_ldate">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Site Date</span>
+              <span class="detail-row-value" id="modal_sdate">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Operational Date</span>
+              <span class="detail-row-value" id="modal_odate">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Decay Date</span>
+              <span class="detail-row-value" id="modal_ddate">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Primary</span>
+              <span class="detail-row-value" id="modal_primary">-</span>
+            </div>
+          </div>
+
+          <!-- Orbital Parameters -->
+          <div class="detail-section">
+            <h3>🌌 Orbital Parameters</h3>
+            <div class="detail-row">
+              <span class="detail-row-label">Perigee</span>
+              <span class="detail-row-value" id="modal_perigee">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Apogee</span>
+              <span class="detail-row-value" id="modal_apogee">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Inclination</span>
+              <span class="detail-row-value" id="modal_inclination">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Eccentricity</span>
+              <span class="detail-row-value" id="modal_eccentricity">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Mean Motion</span>
+              <span class="detail-row-value" id="modal_mean_motion">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Epoch</span>
+              <span class="detail-row-value" id="modal_epoch">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Rev at Epoch</span>
+              <span class="detail-row-value" id="modal_rev_epoch">-</span>
+            </div>
+          </div>
+
+          <!-- Physical Characteristics -->
+          <div class="detail-section">
+            <h3>⚙️ Physical Characteristics</h3>
+            <div class="detail-row">
+              <span class="detail-row-label">Mass</span>
+              <span class="detail-row-value" id="modal_mass">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Dry Mass</span>
+              <span class="detail-row-value" id="modal_drymass">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Total Mass</span>
+              <span class="detail-row-value" id="modal_totmass">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Length</span>
+              <span class="detail-row-value" id="modal_length">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Diameter</span>
+              <span class="detail-row-value" id="modal_diameter">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Span</span>
+              <span class="detail-row-value" id="modal_span">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Shape</span>
+              <span class="detail-row-value" id="modal_shape">-</span>
+            </div>
+          </div>
+
+          <!-- Advanced Orbital Data -->
+          <div class="detail-section">
+            <h3>📊 Advanced Orbital Data</h3>
+            <div class="detail-row">
+              <span class="detail-row-label">RA of Asc Node</span>
+              <span class="detail-row-value" id="modal_ra_node">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Arg of Pericenter</span>
+              <span class="detail-row-value" id="modal_arg_peri">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Mean Anomaly</span>
+              <span class="detail-row-value" id="modal_mean_anomaly">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">BSTAR</span>
+              <span class="detail-row-value" id="modal_bstar">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Mean Motion Dot</span>
+              <span class="detail-row-value" id="modal_mm_dot">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Mean Motion DDot</span>
+              <span class="detail-row-value" id="modal_mm_ddot">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">Element Set No</span>
+              <span class="detail-row-value" id="modal_element_set">-</span>
+            </div>
+          </div>
+
+          <!-- TLE Data Section -->
+          <div
+            class="detail-section tle-section"
+            id="tleSection"
+            style="display: none"
+          >
+            <h3>📡 Two-Line Element Set (TLE)</h3>
+            <div class="detail-row">
+              <span class="detail-row-label">TLE Available</span>
+              <span class="detail-row-value" id="modal_tle_fetched">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row-label">N2YO Satellite Name</span>
+              <span class="detail-row-value" id="modal_n2yo_name">-</span>
+            </div>
+            <div style="margin-top: 1rem">
+              <div class="detail-row-label" style="margin-bottom: 0.5rem">
+                Line 1:
+              </div>
+              <div class="tle-line" id="modal_tle_line1">-</div>
+            </div>
+            <div style="margin-top: 1rem">
+              <div class="detail-row-label" style="margin-bottom: 0.5rem">
+                Line 2:
+              </div>
+              <div class="tle-line" id="modal_tle_line2">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

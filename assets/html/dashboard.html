@@ -235,82 +235,128 @@
       .section-header p {
         color: #cccccc;
         font-size: 1.1rem;
-        max-width: 600px;
+        max-width: 700px;
         margin: 0 auto;
       }
 
-      .dashboard-grid {
+      .features-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 3rem;
-        margin-bottom: 4rem;
-      }
-
-      .dashboard-card {
-        background: #111111;
-        border: 1px solid #333;
-        border-radius: 12px;
-        padding: 2rem;
-        transition: border-color 0.3s ease;
-      }
-
-      .dashboard-card:hover {
-        border-color: #ff6b35;
-      }
-
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-      }
-
-      .card-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-      }
-
-      .status-badge {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-
-      .status-active {
-        background: rgba(46, 213, 115, 0.2);
-        color: #2ed573;
-      }
-
-      .card-stats {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
         margin-bottom: 2rem;
       }
 
-      .stat-item {
-        text-align: center;
+      .feature-card {
+        background: #111111;
+        border: 1px solid #333;
+        border-radius: 16px;
+        padding: 2.5rem;
+        transition: all 0.4s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
       }
 
-      .stat-number {
-        font-size: 2rem;
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ff6b35, #ff8c42);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+      }
+
+      .feature-card:hover {
+        border-color: #ff6b35;
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(255, 107, 53, 0.2);
+      }
+
+      .feature-card:hover::before {
+        transform: scaleX(1);
+      }
+
+      .feature-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+      }
+
+      .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .feature-title {
+        font-size: 1.8rem;
         font-weight: 700;
         color: #ff6b35;
-        display: block;
+        margin-bottom: 0.5rem;
       }
 
-      .stat-label {
-        color: #cccccc;
+      .feature-subtitle {
+        color: #888;
         font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .feature-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 2rem 0;
+      }
+
+      .feature-stat {
+        text-align: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+      }
+
+      .feature-stat-number {
+        display: block;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #ff6b35;
+        margin-bottom: 0.25rem;
+      }
+
+      .feature-stat-label {
+        font-size: 0.75rem;
+        color: #888;
         text-transform: uppercase;
         letter-spacing: 0.05em;
       }
 
       .chart-container {
         height: 200px;
+        margin-top: 1.5rem;
+      }
+
+      .feature-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #ff6b35;
+        font-weight: 600;
+        margin-top: 1rem;
+        font-size: 0.95rem;
+        transition: gap 0.3s ease;
+      }
+
+      .feature-card:hover .feature-cta {
+        gap: 1rem;
+      }
+
+      .feature-cta::after {
+        content: "→";
+        font-size: 1.2rem;
       }
     </style>
   </head>
@@ -320,13 +366,9 @@
       <nav class="nav">
         <a href="dashboard.html" class="logo">THE ORB</a>
         <ul class="nav-menu">
-          <li>
-            <a href="dashboard.html" class="nav-link active">Dashboard</a>
-          </li>
           <li><a href="tracker_v2.html" class="nav-link">Tracker</a></li>
           <li><a href="registry.html" class="nav-link">Registry</a></li>
-          <li><a href="insurance_new.html" class="nav-link">Insurance</a></li>
-          <li><a href="compliance.html" class="nav-link">Compliance</a></li>
+          <li><a href="tools.html" class="nav-link">Tools</a></li>
         </ul>
         <div class="user-profile">
           <div class="user-avatar">SA</div>
@@ -366,61 +408,143 @@
       <section id="dashboard" class="dashboard">
         <div class="container">
           <div class="section-header">
-            <h2>Mission Control Dashboard</h2>
+            <h2>Platform Overview</h2>
             <p>
-              Real-time overview of your satellite operations, fleet status, and
-              critical mission parameters
+              Explore our comprehensive satellite management tools. Click any
+              feature to dive deeper into real-time tracking, data analysis, and
+              compliance management.
             </p>
           </div>
 
-          <div class="dashboard-grid">
-            <div class="dashboard-card">
-              <div class="card-header">
-                <h3 class="card-title">Fleet Overview</h3>
-                <span class="status-badge status-active"
-                  >All Systems Operational</span
-                >
+          <div class="features-grid">
+            <!-- Tracker Feature -->
+            <div
+              class="feature-card"
+              onclick="window.location.href='tracker_v2.html'"
+            >
+              <div class="feature-header">
+                <div>
+                  <div class="feature-icon">🌍</div>
+                  <h3 class="feature-title">Satellite Tracker</h3>
+                  <p class="feature-subtitle">Real-Time 3D Visualization</p>
+                </div>
               </div>
-              <div class="card-stats">
-                <div class="stat-item">
-                  <span class="stat-number" id="totalSatellites">50</span>
-                  <span class="stat-label">Active Satellites</span>
+              <div class="feature-stats">
+                <div class="feature-stat">
+                  <span class="feature-stat-number" id="totalSatellites"
+                    >65,880</span
+                  >
+                  <span class="feature-stat-label">Satellites</span>
                 </div>
-                <div class="stat-item">
-                  <span class="stat-number" id="leoCount">23</span>
-                  <span class="stat-label">LEO Satellites</span>
+                <div class="feature-stat">
+                  <span class="feature-stat-number" id="leoCount">58,042</span>
+                  <span class="feature-stat-label">LEO Orbits</span>
                 </div>
-                <div class="stat-item">
-                  <span class="stat-number">99.7%</span>
-                  <span class="stat-label">Uptime</span>
+                <div class="feature-stat">
+                  <span class="feature-stat-number">60 FPS</span>
+                  <span class="feature-stat-label">Update Rate</span>
                 </div>
               </div>
               <div class="chart-container">
-                <canvas id="fleetChart"></canvas>
+                <canvas id="trackerChart"></canvas>
               </div>
+              <span class="feature-cta">Launch Tracker</span>
             </div>
 
-            <div class="dashboard-card">
-              <div class="card-header">
-                <h3 class="card-title">Orbital Distribution</h3>
+            <!-- Registry Feature -->
+            <div
+              class="feature-card"
+              onclick="window.location.href='registry.html'"
+            >
+              <div class="feature-header">
+                <div>
+                  <div class="feature-icon">📋</div>
+                  <h3 class="feature-title">Satellite Registry</h3>
+                  <p class="feature-subtitle">Comprehensive Database</p>
+                </div>
               </div>
-              <div class="card-stats">
-                <div class="stat-item">
-                  <span class="stat-number" id="meoCount">15</span>
-                  <span class="stat-label">MEO Satellites</span>
+              <div class="feature-stats">
+                <div class="feature-stat">
+                  <span class="feature-stat-number">65,880</span>
+                  <span class="feature-stat-label">Records</span>
                 </div>
-                <div class="stat-item">
-                  <span class="stat-number" id="geoCount">12</span>
-                  <span class="stat-label">GEO Satellites</span>
+                <div class="feature-stat">
+                  <span class="feature-stat-number">60+</span>
+                  <span class="feature-stat-label">Data Fields</span>
                 </div>
-                <div class="stat-item">
-                  <span class="stat-number">100%</span>
-                  <span class="stat-label">Coverage</span>
+                <div class="feature-stat">
+                  <span class="feature-stat-number">120+</span>
+                  <span class="feature-stat-label">Countries</span>
                 </div>
               </div>
               <div class="chart-container">
-                <canvas id="orbitChart"></canvas>
+                <canvas id="registryChart"></canvas>
               </div>
+              <span class="feature-cta">Browse Registry</span>
+            </div>
+
+            <!-- Insurance Feature -->
+            <div
+              class="feature-card"
+              onclick="window.location.href='insurance_new.html'"
+            >
+              <div class="feature-header">
+                <div>
+                  <div class="feature-icon">🛡️</div>
+                  <h3 class="feature-title">Insurance Management</h3>
+                  <p class="feature-subtitle">Risk Assessment & Claims</p>
+                </div>
+              </div>
+              <div class="feature-stats">
+                <div class="feature-stat">
+                  <span class="feature-stat-number">$2.4B</span>
+                  <span class="feature-stat-label">Coverage</span>
+                </div>
+                <div class="feature-stat">
+                  <span class="feature-stat-number">847</span>
+                  <span class="feature-stat-label">Active Policies</span>
+                </div>
+                <div class="feature-stat">
+                  <span class="feature-stat-number">12</span>
+                  <span class="feature-stat-label">Claims YTD</span>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="insuranceChart"></canvas>
+              </div>
+              <span class="feature-cta">Manage Insurance</span>
+            </div>
+
+            <!-- Compliance Feature -->
+            <div
+              class="feature-card"
+              onclick="window.location.href='compliance.html'"
+            >
+              <div class="feature-header">
+                <div>
+                  <div class="feature-icon">⚖️</div>
+                  <h3 class="feature-title">Compliance Hub</h3>
+                  <p class="feature-subtitle">Regulatory & Treaty Monitoring</p>
+                </div>
+              </div>
+              <div class="feature-stats">
+                <div class="feature-stat">
+                  <span class="feature-stat-number">15</span>
+                  <span class="feature-stat-label">Treaties</span>
+                </div>
+                <div class="feature-stat">
+                  <span class="feature-stat-number">98.5%</span>
+                  <span class="feature-stat-label">Compliance</span>
+                </div>
+                <div class="feature-stat">
+                  <span class="feature-stat-number">23</span>
+                  <span class="feature-stat-label">Alerts</span>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="complianceChart"></canvas>
+              </div>
+              <span class="feature-cta">View Compliance</span>
             </div>
           </div>
         </div>
@@ -430,20 +554,54 @@
     <script>
       // Initialize charts
       function initializeCharts() {
-        // Fleet Chart
-        const fleetCtx = document.getElementById("fleetChart").getContext("2d");
-        new Chart(fleetCtx, {
-          type: "line",
+        // Tracker Chart - Orbital Distribution
+        const trackerCtx = document
+          .getElementById("trackerChart")
+          .getContext("2d");
+        new Chart(trackerCtx, {
+          type: "doughnut",
           data: {
-            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            labels: ["LEO", "MEO", "GEO", "Other"],
             datasets: [
               {
-                label: "Active Satellites",
-                data: [42, 45, 47, 48, 49, 50],
-                borderColor: "#ff6b35",
-                backgroundColor: "rgba(255, 107, 53, 0.1)",
-                tension: 0.4,
-                fill: true,
+                data: [58042, 4521, 3215, 102],
+                backgroundColor: ["#ff6b35", "#ff8c42", "#ffa94d", "#666"],
+                borderWidth: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  color: "#ccc",
+                  padding: 10,
+                  font: {
+                    size: 11,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        // Registry Chart - Status Distribution
+        const registryCtx = document
+          .getElementById("registryChart")
+          .getContext("2d");
+        new Chart(registryCtx, {
+          type: "bar",
+          data: {
+            labels: ["Active", "Inactive", "Debris", "Decayed"],
+            datasets: [
+              {
+                label: "Satellites",
+                data: [12450, 8920, 35810, 8700],
+                backgroundColor: ["#22c55e", "#fbbf24", "#ef4444", "#6b7280"],
+                borderWidth: 0,
               },
             ],
           },
@@ -457,17 +615,20 @@
             },
             scales: {
               y: {
-                beginAtZero: false,
+                beginAtZero: true,
                 grid: {
                   color: "#333",
                 },
                 ticks: {
                   color: "#ccc",
+                  callback: function (value) {
+                    return (value / 1000).toFixed(0) + "k";
+                  },
                 },
               },
               x: {
                 grid: {
-                  color: "#333",
+                  display: false,
                 },
                 ticks: {
                   color: "#ccc",
@@ -477,17 +638,23 @@
           },
         });
 
-        // Orbit Chart
-        const orbitCtx = document.getElementById("orbitChart").getContext("2d");
-        new Chart(orbitCtx, {
-          type: "doughnut",
+        // Insurance Chart - Monthly Claims
+        const insuranceCtx = document
+          .getElementById("insuranceChart")
+          .getContext("2d");
+        new Chart(insuranceCtx, {
+          type: "line",
           data: {
-            labels: ["LEO", "MEO", "GEO"],
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
             datasets: [
               {
-                data: [23, 15, 12],
-                backgroundColor: ["#ff6b35", "#ff8c42", "#ffa94d"],
-                borderWidth: 0,
+                label: "Claims ($M)",
+                data: [12, 8, 15, 6, 9, 11],
+                borderColor: "#ff6b35",
+                backgroundColor: "rgba(255, 107, 53, 0.1)",
+                tension: 0.4,
+                fill: true,
+                borderWidth: 2,
               },
             ],
           },
@@ -496,10 +663,84 @@
             maintainAspectRatio: false,
             plugins: {
               legend: {
-                position: "bottom",
-                labels: {
+                display: false,
+              },
+            },
+            scales: {
+              x: {
+                grid: {
+                  color: "#333",
+                },
+                ticks: {
                   color: "#ccc",
-                  padding: 15,
+                },
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: "#333",
+                },
+                ticks: {
+                  color: "#ccc",
+                  callback: function (value) {
+                    return "$" + value + "M";
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        // Compliance Chart - Treaty Adherence
+        const complianceCtx = document
+          .getElementById("complianceChart")
+          .getContext("2d");
+        new Chart(complianceCtx, {
+          type: "radar",
+          data: {
+            labels: [
+              "Outer Space",
+              "Rescue",
+              "Liability",
+              "Registration",
+              "Moon",
+              "Debris",
+            ],
+            datasets: [
+              {
+                label: "Compliance %",
+                data: [98, 100, 97, 99, 95, 98],
+                borderColor: "#ff6b35",
+                backgroundColor: "rgba(255, 107, 53, 0.2)",
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  color: "#ccc",
+                  backdropColor: "transparent",
+                  stepSize: 20,
+                },
+                grid: {
+                  color: "#333",
+                },
+                pointLabels: {
+                  color: "#ccc",
+                  font: {
+                    size: 10,
+                  },
                 },
               },
             },
@@ -510,9 +751,7 @@
       // Load satellite data and update stats
       async function loadDashboardStats() {
         try {
-          const response = await fetch(
-            "../../data/satellites_with_tle_n2yo.csv"
-          );
+          const response = await fetch("../../data/satellite_master_list.csv");
           const csvText = await response.text();
           const lines = csvText.trim().split("\n");
           const headers = lines[0].split(",");
@@ -530,15 +769,15 @@
 
             const altitude = parseFloat(record.SEMIMAJOR_AXIS || 0) - 6371;
             if (altitude < 2000) leoCount++;
-            else if (altitude < 10000) meoCount++;
+            else if (altitude < 35000) meoCount++;
             else geoCount++;
           }
 
-          document.getElementById("totalSatellites").textContent =
-            lines.length - 1;
-          document.getElementById("leoCount").textContent = leoCount;
-          document.getElementById("meoCount").textContent = meoCount;
-          document.getElementById("geoCount").textContent = geoCount;
+          document.getElementById("totalSatellites").textContent = (
+            lines.length - 1
+          ).toLocaleString();
+          document.getElementById("leoCount").textContent =
+            leoCount.toLocaleString();
         } catch (error) {
           console.error("Error loading dashboard stats:", error);
         }

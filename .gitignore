@@ -1,3 +1,16 @@
 .env
 /.venv
 __pycache__/api.cpython-312.pyc
+node_modules
+data/merged_satellite_data.csv
+data/orgs_master.csv
+data/satellite_master_list_backup.csv
+data/satellite_master_list_before_tle.csv
+assets/html/tracker_v2.html
+readmes
+scripts/migrate_html_files.ps1
+scripts/scrape_orgs.py
+scripts/merge.py
+scripts/add_tle_to_master.py
+.astro/settings.json
+.astro/types.d.ts

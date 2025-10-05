@@ -1,151 +1,136 @@
-# THE ORB - Satellite Operations Platform
+# 🛰️ THE ORB
 
-**Precision Beyond Orbit** - A comprehensive satellite tracking, registry, insurance, and compliance management system.
+> **Precision Beyond Orbit** - Unified satellite tracking, registry, and management platform
 
-## Prerequisites
+A comprehensive web-based system for real-time satellite visualization, data management, insurance tracking, and regulatory compliance monitoring.
 
-- **Python 3.8+** - [Download Python](https://www.python.org/downloads/)
-- **Node.js 16+** (optional, for development tools) - [Download Node.js](https://nodejs.org/)
+![Satellite Tracker](https://img.shields.io/badge/Satellites-65%2C880-orange)
+![Status](https://img.shields.io/badge/Status-Active-success)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-## Quick Start
+---
 
-### 1. Install Python Dependencies
+## ✨ Features
 
-```powershell
-pip install -r requirements.txt
+- **🌍 3D Satellite Tracker** - Real-time visualization of 65,880+ satellites using Cesium.js
+- **📋 Satellite Registry** - Comprehensive database with 60+ data fields per satellite
+- **🛡️ Insurance Management** - Track policies, coverage, and claims
+- **⚖️ Compliance Hub** - Monitor treaty adherence and regulatory requirements
+- **🎯 Advanced Filtering** - Filter by status, orbit type, country, organization, and more
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.8+
+- Modern web browser (Chrome, Firefox, Edge)
+
+### Installation & Running
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/GerritPotgieter/Nasa-Space-Apps.git
+   cd Nasa-Space-Apps
+   ```
+
+2. **Start the local server**
+
+   ```bash
+   python -m http.server 8080
+   ```
+
+3. **Open in browser**
+   ```
+   http://localhost:8080/assets/html/dashboard.html
+   ```
+
+That's it! 🎉
+
+---
+
+## 📂 Project Structure
+
 ```
-
-The `requirements.txt` includes:
-- Flask (web server)
-- requests (HTTP library)
-- python-dotenv (environment management)
-- Other data processing libraries
-
-### 2. Install Node.js Dependencies (Optional)
-
-If you're using any Node.js build tools or development dependencies:
-
-```powershell
-npm install
-```
-
-### 3. Start the HTTP Server
-
-The application uses Python's built-in HTTP server. Run from the project root:
-
-```powershell
-python -m http.server 8080
-```
-
-**Default address:** `http://localhost:8080`
-
-### 4. Access the Application
-
-Open your browser and navigate to:
-
-- **Dashboard**: http://localhost:8080/assets/html/dashboard.html
-- **Satellite Tracker**: http://localhost:8080/assets/html/tracker_v2.html
-- **Registry**: http://localhost:8080/assets/html/registry.html
-- **Insurance**: http://localhost:8080/assets/html/insurance_new.html
-- **Compliance**: http://localhost:8080/assets/html/compliance.html
-
-## Project Structure
-
-```
-Nasa Space Apps/
-├── api.py                      # Main HTTP server
-├── requirements.txt            # Python dependencies
+Nasa-Space-Apps/
 ├── assets/
-│   ├── html/                   # Application pages
-│   │   ├── dashboard.html      # Main landing page
-│   │   ├── tracker_v2.html     # 3D satellite tracking
-│   │   ├── registry.html       # 65,880 satellite database
-│   │   ├── insurance_new.html  # Fleet insurance management
-│   │   └── compliance.html     # Big Five treaty tracker
-│   └── js/                     # JavaScript modules
-│       ├── globe.js
-│       └── satellites.js
-├── data/                       # Satellite data files
-│   ├── active-20251004.csv
-│   ├── satcat_master.csv
-│   └── satellites_with_tle_n2yo.csv
-├── scripts/                    # Utility scripts
-└── readmes/                    # Documentation
+│   ├── html/           # All HTML pages
+│   ├── js/             # JavaScript modules
+│   └── css/            # Shared stylesheets
+├── data/               # Satellite datasets (CSV)
+├── scripts/            # Data fetching scripts
+└── README.md
 ```
 
-## Features
+---
 
-### 🌍 3D Satellite Tracker (tracker_v2.html)
-- Real-time satellite visualization with Cesium.js
-- Live orbital paths and ground tracks
-- Search and filter 65,880+ satellites
+## 🗺️ Navigation
 
-### 📊 Satellite Registry (registry.html)
-- Complete SATCAT database
-- Advanced filtering (owner, orbit type, status)
-- Pagination for large datasets
+| Page          | URL                            | Description                             |
+| ------------- | ------------------------------ | --------------------------------------- |
+| **Dashboard** | `/assets/html/dashboard.html`  | Platform overview with feature previews |
+| **Tracker**   | `/assets/html/tracker_v2.html` | 3D real-time satellite visualization    |
+| **Registry**  | `/assets/html/registry.html`   | Searchable satellite database           |
+| **Tools**     | `/assets/html/tools.html`      | Insurance & compliance tools hub        |
 
-### 🛡️ Fleet Insurance (insurance_new.html)
-- Coverage management for satellite fleets
-- Risk assessment and policy tracking
+---
+
+## 🛠️ Technologies
+
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **3D Visualization**: Cesium.js 1.118
+- **Orbital Mechanics**: Satellite.js 5.0
+- **Charts**: Chart.js 3.9
+- **Data**: TLE orbital elements, satellite registry CSVs
+
+---
+
+## 📊 Data Sources
+
+- Satellite catalog data from space-track.org
+- TLE (Two-Line Element) orbital data
+- Organization and ownership information
+- Compliance and treaty databases
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Feel free to:
+
+- Report bugs
+- Suggest features
+- Submit pull requests
+
+---
+
+## 📝 License
+
+MIT License - see LICENSE file for details
+
+---
+
+## 🌟 Acknowledgments
+
+Built for NASA Space Apps Challenge 2024
+
+- Team: Space Operations Excellence
+- Challenge: Satellite Operations Management
+
+---
+
+**Made with 🚀 by GerritPotgieter**
+
 - Tier-based access control
 
 ### ⚖️ Compliance Tracker (compliance.html)
+
 - Big Five treaty compliance monitoring
 - OST, Rescue, Liability, Registration, ITU Radio
 - Jurisdiction analysis
 
-## Development
-
-### Running Scripts
-
-Update satellite data:
-```powershell
-python scripts/update_active_satellites.py
-```
-
-Fetch TLE data:
-```powershell
-python scripts/fetch_tle_n2yo.py
-```
-
-### API Endpoints
-
-The `api.py` server provides:
-- Satellite data queries
-- TLE updates
-- Registry search/filter
-
-## Troubleshooting
-
-**Port 8080 already in use:**
-```powershell
-# Find process using port 8080
-netstat -ano | findstr :8080
-
-# Kill the process (replace PID with actual process ID)
-taskkill /PID <PID> /F
-```
-
-**Python not found:**
-- Ensure Python is added to PATH during installation
-- Restart terminal after installing Python
-
-**Module not found errors:**
-- Run `pip install -r requirements.txt` again
-- Check Python version: `python --version`
-
-## Design System
-
-**ORB Brand Guidelines:**
-- **Typography**: Playfair Display (headers), Inter (body)
-- **Colors**: Deep Charcoal (#121212), Off-White (#eaeaea), Accent Orange (#e85d04)
-- **Effects**: Glassmorphism with blur(20px)
-
 ## License
 
 NASA Space Apps Challenge 2024 Project
-
-## Support
-
-For issues or questions, check the `/readmes` directory for detailed documentation on specific features.

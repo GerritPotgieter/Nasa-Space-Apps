@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE ORB - Tools & Resources</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: #000000;
+        color: #ffffff;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      /* Header Styles */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid #333;
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: #ffffff;
+        text-decoration: none;
+      }
+
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 3rem;
+      }
+
+      .nav-link {
+        color: #cccccc;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: #ff6b35;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b35, #ff8c42);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+
+      .main {
+        padding-top: 70px;
+        min-height: 100vh;
+      }
+
+      /* Hero Section */
+      .hero {
+        padding: 6rem 0 4rem;
+        text-align: center;
+        background: radial-gradient(
+          circle at 50% 50%,
+          rgba(255, 107, 53, 0.1),
+          transparent 70%
+        );
+      }
+
+      .hero h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #ff6b35, #ff8c42);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .hero p {
+        font-size: 1.3rem;
+        color: #cccccc;
+        max-width: 700px;
+        margin: 0 auto 3rem;
+      }
+
+      /* Tools Grid */
+      .tools-section {
+        padding: 4rem 0 6rem;
+      }
+
+      .tools-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 3rem;
+        margin-bottom: 4rem;
+      }
+
+      .tool-card {
+        background: #111111;
+        border: 2px solid #333;
+        border-radius: 20px;
+        padding: 3rem;
+        transition: all 0.4s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .tool-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #ff6b35, #ff8c42);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+      }
+
+      .tool-card:hover {
+        border-color: #ff6b35;
+        transform: translateY(-10px);
+        box-shadow: 0 25px 50px rgba(255, 107, 53, 0.3);
+      }
+
+      .tool-card:hover::before {
+        transform: scaleX(1);
+      }
+
+      .tool-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        display: block;
+      }
+
+      .tool-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #ff6b35;
+        margin-bottom: 1rem;
+      }
+
+      .tool-description {
+        font-size: 1.1rem;
+        color: #cccccc;
+        line-height: 1.8;
+        margin-bottom: 2rem;
+      }
+
+      .tool-features {
+        list-style: none;
+        margin-bottom: 2rem;
+      }
+
+      .tool-features li {
+        padding: 0.75rem 0;
+        color: #aaa;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .tool-features li:last-child {
+        border-bottom: none;
+      }
+
+      .tool-features li::before {
+        content: "✓";
+        color: #ff6b35;
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+
+      .tool-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: linear-gradient(135deg, #ff6b35, #ff8c42);
+        color: #000;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .tool-card:hover .tool-cta {
+        transform: translateX(5px);
+        box-shadow: 0 10px 30px rgba(255, 107, 53, 0.5);
+      }
+
+      .tool-cta::after {
+        content: "→";
+        font-size: 1.5rem;
+      }
+
+      /* Additional Tools Section */
+      .additional-tools {
+        padding: 4rem 0;
+        border-top: 1px solid #333;
+      }
+
+      .section-title {
+        font-family: "Playfair Display", serif;
+        font-size: 2.5rem;
+        text-align: center;
+        margin-bottom: 3rem;
+        color: #ff6b35;
+      }
+
+      .utility-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+      }
+
+      .utility-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .utility-card:hover {
+        background: rgba(255, 107, 53, 0.05);
+        border-color: #ff6b35;
+        transform: translateY(-5px);
+      }
+
+      .utility-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .utility-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #fff;
+      }
+
+      .utility-description {
+        font-size: 0.9rem;
+        color: #888;
+      }
+
+      .coming-soon {
+        display: inline-block;
+        background: rgba(255, 107, 53, 0.2);
+        color: #ff6b35;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <a href="dashboard.html" class="logo">THE ORB</a>
+        <ul class="nav-menu">
+          <li><a href="tracker_v2.html" class="nav-link">Tracker</a></li>
+          <li><a href="registry.html" class="nav-link">Registry</a></li>
+          <li><a href="tools.html" class="nav-link active">Tools</a></li>
+        </ul>
+        <div class="user-profile">
+          <div class="user-avatar">SA</div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main">
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="container">
+          <h1>Tools & Resources</h1>
+          <p>
+            Comprehensive suite of satellite management tools designed for
+            operators, insurers, regulators, and space industry professionals.
+          </p>
+        </div>
+      </section>
+
+      <!-- Main Tools -->
+      <section class="tools-section">
+        <div class="container">
+          <div class="tools-grid">
+            <!-- Insurance Tool -->
+            <div
+              class="tool-card"
+              onclick="window.location.href='insurance_new.html'"
+            >
+              <span class="tool-icon">🛡️</span>
+              <h2 class="tool-title">Insurance Management</h2>
+              <p class="tool-description">
+                Advanced risk assessment, policy management, and claims
+                processing for satellite insurance providers and operators.
+              </p>
+              <ul class="tool-features">
+                <li>Real-time risk assessment algorithms</li>
+                <li>Policy lifecycle management</li>
+                <li>Claims tracking and processing</li>
+                <li>Premium calculation tools</li>
+                <li>Coverage analysis and reports</li>
+              </ul>
+              <a href="insurance_new.html" class="tool-cta"
+                >Launch Insurance Portal</a
+              >
+            </div>
+
+            <!-- Compliance Tool -->
+            <div
+              class="tool-card"
+              onclick="window.location.href='compliance.html'"
+            >
+              <span class="tool-icon">⚖️</span>
+              <h2 class="tool-title">Compliance Hub</h2>
+              <p class="tool-description">
+                Monitor regulatory compliance, track treaty adherence, and
+                manage licensing requirements for satellite operations.
+              </p>
+              <ul class="tool-features">
+                <li>International treaty monitoring</li>
+                <li>Regulatory compliance tracking</li>
+                <li>License and permit management</li>
+                <li>Automated compliance alerts</li>
+                <li>Audit trail and reporting</li>
+              </ul>
+              <a href="compliance.html" class="tool-cta">Open Compliance Hub</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Additional Utilities -->
+      <section class="additional-tools">
+        <div class="container">
+          <h2 class="section-title">Additional Utilities</h2>
+          <div class="utility-grid">
+            <div class="utility-card">
+              <div class="utility-icon">📊</div>
+              <h3 class="utility-title">Analytics Dashboard</h3>
+              <p class="utility-description">
+                Advanced data visualization and trend analysis
+              </p>
+              <span class="coming-soon">Coming Soon</span>
+            </div>
+
+            <div class="utility-card">
+              <div class="utility-icon">🔔</div>
+              <h3 class="utility-title">Alert System</h3>
+              <p class="utility-description">
+                Real-time notifications for critical events
+              </p>
+              <span class="coming-soon">Coming Soon</span>
+            </div>
+
+            <div class="utility-card">
+              <div class="utility-icon">📡</div>
+              <h3 class="utility-title">TLE Manager</h3>
+              <p class="utility-description">
+                Orbital element data management and updates
+              </p>
+              <span class="coming-soon">Coming Soon</span>
+            </div>
+
+            <div class="utility-card">
+              <div class="utility-icon">🗂️</div>
+              <h3 class="utility-title">Document Vault</h3>
+              <p class="utility-description">
+                Secure storage for licenses and certificates
+              </p>
+              <span class="coming-soon">Coming Soon</span>
+            </div>
+
+            <div class="utility-card">
+              <div class="utility-icon">🤝</div>
+              <h3 class="utility-title">API Access</h3>
+              <p class="utility-description">
+                Developer tools and API documentation
+              </p>
+              <span class="coming-soon">Coming Soon</span>
+            </div>
+
+            <div class="utility-card">
+              <div class="utility-icon">📚</div>
+              <h3 class="utility-title">Knowledge Base</h3>
+              <p class="utility-description">
+                Comprehensive guides and documentation
+              </p>
+              <span class="coming-soon">Coming Soon</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
