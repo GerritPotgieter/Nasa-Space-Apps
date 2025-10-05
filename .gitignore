@@ -14,3 +14,6 @@ scripts/merge.py
 scripts/add_tle_to_master.py
 .astro/settings.json
 .astro/types.d.ts
+data/active*
+data/postgres*
+data/satcat_master
