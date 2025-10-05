@@ -1,4 +1,5 @@
-# 🛰️ THE ORB
+
+<img width="972" height="724" alt="TheOrbImageWithText1" src="https://github.com/user-attachments/assets/03df7b19-2797-4676-ad7b-54a9941a11d7" />
 
 > **Precision Beyond Orbit** - Unified satellite tracking, registry, and management platform
 
