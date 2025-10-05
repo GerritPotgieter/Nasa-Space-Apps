@@ -11,17 +11,17 @@ A comprehensive web-based system for real-time satellite visualization, data man
 
 ---
 
-## ✨ Features
+##  Features
 
-- **🌍 3D Satellite Tracker** - Real-time visualization of 65,880+ satellites using Cesium.js
-- **📋 Satellite Registry** - Comprehensive database with 60+ data fields per satellite
-- **🛡️ Insurance Management** - Track policies, coverage, and claims
-- **⚖️ Compliance Hub** - Monitor treaty adherence and regulatory requirements
-- **🎯 Advanced Filtering** - Filter by status, orbit type, country, organization, and more
+- ** 3D Satellite Tracker** - Real-time visualization of 65,880+ satellites using Cesium.js
+- ** Satellite Registry** - Comprehensive database with 60+ data fields per satellite
+- ** Insurance Management** - Track policies, coverage, and claims
+- ** Compliance Hub** - Monitor treaty adherence and regulatory requirements
+- ** Advanced Filtering** - Filter by status, orbit type, country, organization, and more
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 
@@ -48,11 +48,11 @@ A comprehensive web-based system for real-time satellite visualization, data man
    http://localhost:8080/assets/html/dashboard.html
    ```
 
-That's it! 🎉
+That's it! 
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 Nasa-Space-Apps/
@@ -67,7 +67,7 @@ Nasa-Space-Apps/
 
 ---
 
-## 🗺️ Navigation
+##  Navigation
 
 | Page          | URL                            | Description                             |
 | ------------- | ------------------------------ | --------------------------------------- |
@@ -78,7 +78,7 @@ Nasa-Space-Apps/
 
 ---
 
-## 🛠️ Technologies
+##  Technologies
 
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
 - **3D Visualization**: Cesium.js 1.118
@@ -88,7 +88,7 @@ Nasa-Space-Apps/
 
 ---
 
-## 📊 Data Sources
+##  Data Sources
 
 - Satellite catalog data from space-track.org
 - TLE (Two-Line Element) orbital data
@@ -97,7 +97,7 @@ Nasa-Space-Apps/
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions welcome! Feel free to:
 
@@ -107,13 +107,13 @@ Contributions welcome! Feel free to:
 
 ---
 
-## 📝 License
+##  License
 
 MIT License - see LICENSE file for details
 
 ---
 
-## 🌟 Acknowledgments
+##  Acknowledgments
 
 Built for NASA Space Apps Challenge 2024
 
@@ -122,11 +122,11 @@ Built for NASA Space Apps Challenge 2024
 
 ---
 
-**Made with 🚀 by GerritPotgieter**
+**Made with  by GerritPotgieter**
 
 - Tier-based access control
 
-### ⚖️ Compliance Tracker (compliance.html)
+###  Compliance Tracker (compliance.html)
 
 - Big Five treaty compliance monitoring
 - OST, Rescue, Liability, Registration, ITU Radio
