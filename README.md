@@ -109,7 +109,7 @@ Contributions welcome! Feel free to:
 
 ##  Acknowledgments
 
-Built for NASA Space Apps Challenge 2024
+Built for NASA Space Apps Challenge 2025
 
 - Team: Space Operations Excellence
 - Challenge: Satellite Operations Management
