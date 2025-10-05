@@ -10,14 +10,14 @@ A comprehensive web-based system for real-time satellite visualization, data man
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
 ---
-
+# [Website landing Page](https://nuanced-understood-975603.framer.app/about)
 ##  Features
 
-- ** 3D Satellite Tracker** - Real-time visualization of 65,880+ satellites using Cesium.js
-- ** Satellite Registry** - Comprehensive database with 60+ data fields per satellite
-- ** Insurance Management** - Track policies, coverage, and claims
-- ** Compliance Hub** - Monitor treaty adherence and regulatory requirements
-- ** Advanced Filtering** - Filter by status, orbit type, country, organization, and more
+- 3D Satellite Tracker - Real-time visualization of 65,880+ satellites using Cesium.js
+- Satellite Registry- Comprehensive database with 60+ data fields per satellite
+- Insurance Management - Track policies, coverage, and claims
+- Compliance Hub - Monitor treaty adherence and regulatory requirements
+- Advanced Filtering- Filter by status, orbit type, country, organization, and more
 
 ---
 
@@ -107,12 +107,6 @@ Contributions welcome! Feel free to:
 
 ---
 
-##  License
-
-MIT License - see LICENSE file for details
-
----
-
 ##  Acknowledgments
 
 Built for NASA Space Apps Challenge 2024
@@ -134,4 +128,4 @@ Built for NASA Space Apps Challenge 2024
 
 ## License
 
-NASA Space Apps Challenge 2024 Project
+NASA Space Apps Challenge 2025 Project
